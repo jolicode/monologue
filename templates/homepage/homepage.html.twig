@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Monolog{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1>
+            <marquee>
+                Welcome to Monolog!
+            </marquee>
+        </h1>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <h5 class="card-header">
+                        Last events
+                        <small>({{ date|date('Y-m-d') }})</small>
+                    </h5>
+                    <div class="card-body">
+                        <table class="table table-striped table-sm">
+                            <tr>
+                                <th>Author</th>
+                                <th>Content</th>
+                                <th>Created At</th>
+                            </tr>
+                            {% for event in events %}
+                                <tr>
+                                    <td>{{ event.author }}</td>
+                                    <td>{{ event.content }}</td>
+                                    <td>{{ event.createdAt|date('H:i:s.v') }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3">
+                                        No events!
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <div class="d-flex">
+                            <a href="{{ url('homepage', {date: date.modify('-1 day').format('Y-m-d')}) }}" class="">⬅</a>
+                            <a href="{{ url('homepage', {date: date.modify('+1 day').format('Y-m-d')}) }}" class="ml-auto">➡</a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card">
+                    <h5 class="card-header">
+                        Pending depts
+                    </h5>
+                    <div class="card-body">
+                        <table class="table table-striped table-sm">
+                            <tr>
+                                <th>Author</th>
+                                <th>Content</th>
+                                <th>Cause</th>
+                                <th>Created At</th>
+                            </tr>
+                            {% for debt in debts %}
+                                <tr>
+                                    <td>{{ debt.author }}</td>
+                                    <td>{{ debt.event.content }}</td>
+                                    <td>{{ debt.cause.content }}</td>
+                                    <td>{{ debt.createdAt|date('Y-m-d H:i:s.v') }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">
+                                        No debts!
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

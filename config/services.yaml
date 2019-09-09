@@ -1,0 +1,24 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            string $channel: "%env(SLACK_CHANNEL)%"
+            string $token: "%env(SLACK_TOKEN)%"
+            string $timezone: "%env(TIMEZONE)%"
+
+    App\:
+        resource: '../src/*'
+        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
+    App\Controller\:
+        resource: '../src/Controller'
+        tags: ['controller.service_arguments']
+
+    App\ControlTower\DebtCreator:
+        public: true
+
+    App\ControlTower\BigBrowser:
+        public: true

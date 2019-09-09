@@ -1,0 +1,17 @@
+doctrine:
+    dbal:
+        server_version: '10'
+        url: '%env(resolve:DATABASE_URL)%'
+        types:
+            datetime_immutable_ms: App\Doctrine\Type\DateTimeImmutableWithMillis
+    orm:
+        auto_generate_proxy_classes: true
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App

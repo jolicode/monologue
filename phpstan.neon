@@ -1,0 +1,5 @@
+parameters:
+    inferPrivatePropertyTypeFromConstructor: true
+
+    excludes_analyse:
+        - src/Migrations/

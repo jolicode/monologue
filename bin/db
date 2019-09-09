@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -e
+BASE=$(dirname $0)/..
+
+$BASE/bin/console doctrine:database:drop --force || true
+$BASE/bin/console doctrine:database:create
+$BASE/bin/console doctrine:migration:migrate -n
