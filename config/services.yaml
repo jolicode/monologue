@@ -5,6 +5,7 @@ services:
         autowire: true
         autoconfigure: true
         bind:
+            string $signinSecret: "%env(SLACK_SIGNING_SECRET)%"
             string $channel: "%env(SLACK_CHANNEL)%"
             string $token: "%env(SLACK_TOKEN)%"
             string $timezone: "%env(TIMEZONE)%"
