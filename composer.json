@@ -14,6 +14,7 @@
         "symfony/maker-bundle": "^1.13",
         "symfony/monolog-bundle": "^3.4",
         "symfony/orm-pack": "^1.0",
+        "symfony/security-bundle": "4.3.*",
         "symfony/test-pack": "^1.0",
         "symfony/twig-bundle": "4.3.*",
         "symfony/web-server-bundle": "4.3.*",
