@@ -40,6 +40,10 @@ class DateTimeImmutableWithMillis extends Type
         $val = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s.v', $value);
 
         if (!$val) {
+            $val = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $value);
+        }
+
+        if (!$val) {
             throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeFormatString());
         }
 
