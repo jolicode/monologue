@@ -2,6 +2,7 @@
 
 namespace App\ControlTower;
 
+use App\Entity\Debt;
 use App\Repository\DebtRepository;
 use App\Util\UuidGenerator;
 
@@ -14,7 +15,7 @@ class DebtAcker
         $this->debtRepository = $debtRepository;
     }
 
-    public function ackDebt(array $payload, string $debtId)
+    public function ackDebt(array $payload, string $debtId): Debt
     {
         if (!UuidGenerator::isValidV4($debtId)) {
             throw new \DomainException('The UUID is not valid.');
@@ -30,5 +31,7 @@ class DebtAcker
         }
 
         $debt->markAsPaid();
+
+        return $debt;
     }
 }

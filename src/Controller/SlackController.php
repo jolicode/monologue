@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\ControlTower\BigBrowser;
 use App\ControlTower\DebtAcker;
+use App\Slack\DebtAckPoster;
 use App\Slack\DebtListBlockBuilder;
 use App\Slack\DebtListPoster;
+use App\Slack\MessagePoster;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,14 +22,16 @@ class SlackController extends AbstractController
     private $debtListBlockBuider;
     private $debtListPoster;
     private $em;
+    private $debAckPoster;
 
-    public function __construct(BigBrowser $bigBrowser, DebtAcker $debtAcker, DebtListBlockBuilder $debtListBlockBuider, DebtListPoster $debtListPoster, ObjectManager $em)
+    public function __construct(BigBrowser $bigBrowser, DebtAcker $debtAcker, DebtListBlockBuilder $debtListBlockBuider, DebtListPoster $debtListPoster, ObjectManager $em, DebtAckPoster $debAckPoster)
     {
         $this->bigBrowser = $bigBrowser;
         $this->debtAcker = $debtAcker;
         $this->debtListBlockBuider = $debtListBlockBuider;
         $this->debtListPoster = $debtListPoster;
         $this->em = $em;
+        $this->debAckPoster = $debAckPoster;
     }
 
     /** @Route("/message", methods="POST") */
@@ -46,17 +50,16 @@ class SlackController extends AbstractController
             return new Response('No payload', 400);
         }
 
-        if ('debt_list' === $payload['actions'][0]['value']) {
-            $this->debtListPoster->postDebtList();
-        } elseif (preg_match('{^ack\-(.*)$}', $payload['actions'][0]['value'] ?? '', $m)) {
+        if (preg_match('{^ack\-(.*)$}', $payload['actions'][0]['value'] ?? '', $m)) {
             $debtId = $m[1];
             try {
-                $this->debtAcker->ackDebt($payload, $debtId);
+                $debt = $this->debtAcker->ackDebt($payload, $debtId);
             } catch (\DomainException $e) {
                 return new Response($e->getMessage(), 400);
             }
             $this->em->flush();
             $this->debtListPoster->postDebtList($payload['response_url']);
+            $this->debAckPoster->postDebtAck($debt, $payload['user']['id']);
         } else {
             return new Response('Payload not supported.', 400);
         }
@@ -68,7 +71,7 @@ class SlackController extends AbstractController
     public function commandList(Request $request)
     {
         return $this->json([
-            'text' => 'Pending debts', // Not used but mandatory
+            'text' => 'Dettes en attente', // Not used but mandatory
             'blocks' => $this->debtListBlockBuider->buildBlocks(),
         ]);
     }

@@ -25,7 +25,7 @@ class DebtListBlockBuilder
                     'type' => 'section',
                     'text' => [
                         'type' => 'mrkdwn',
-                        'text' => '*There are no pending depts*',
+                        'text' => '*Il n\'y a plus de dette*',
                     ],
                 ],
             ];
@@ -36,7 +36,7 @@ class DebtListBlockBuilder
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => '*Current debts*',
+                    'text' => '*Dettes en cours*',
                 ],
             ],
             [
@@ -50,13 +50,13 @@ class DebtListBlockBuilder
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => sprintf('<@%s>, since %s days.', $event->getAuthor(), (new \DateTime())->diff($event->getCreatedAt())->format('%a')),
+                    'text' => sprintf('<@%s>, depuis %s jours.', $event->getAuthor(), (new \DateTime())->diff($event->getCreatedAt())->format('%a')),
                 ],
                 'accessory' => [
                     'type' => 'button',
                     'text' => [
                         'type' => 'plain_text',
-                        'text' => 'Mark as paid',
+                        'text' => 'Marquer comme payé',
                         'emoji' => true,
                     ],
                     'value' => 'ack-'.$debt->getId(),

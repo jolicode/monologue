@@ -35,6 +35,9 @@ class Debt
     /** @ORM\Column(type="date_immutable") */
     private $createdAt;
 
+    /** @ORM\Column(type="date_immutable", nullable=true) */
+    private $paidAt;
+
     /** @ORM\Column(type="boolean") */
     private $paid;
 
@@ -81,5 +84,6 @@ class Debt
     public function markAsPaid()
     {
         $this->paid = true;
+        $this->paidAt = new \DateTimeImmutable();
     }
 }

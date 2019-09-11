@@ -17,6 +17,6 @@ class DebtListPoster
     {
         $blocks = $this->blockBuilder->buildBlocks();
 
-        $this->messagePoster->postMessage('Pending debts.', $blocks, $responseUrl);
+        $this->messagePoster->postMessage('Dettes en attente.', $blocks, $responseUrl);
     }
 }
