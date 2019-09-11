@@ -36,7 +36,7 @@ class DebtListBlockBuilder
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => '*Find bellow the pending debs*',
+                    'text' => '*Current debts*',
                 ],
             ],
             [
@@ -50,13 +50,13 @@ class DebtListBlockBuilder
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => sprintf('<@%s> on %s', $event->getAuthor(), $event->getCreatedAt()->format('Y-m-d')),
+                    'text' => sprintf('<@%s>, since %s days.', $event->getAuthor(), (new \DateTime())->diff($event->getCreatedAt())->format('%a')),
                 ],
                 'accessory' => [
                     'type' => 'button',
                     'text' => [
                         'type' => 'plain_text',
-                        'text' => 'ACK',
+                        'text' => 'Mark as paid',
                         'emoji' => true,
                     ],
                     'value' => 'ack-'.$debt->getId(),
