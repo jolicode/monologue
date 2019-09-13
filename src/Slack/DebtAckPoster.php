@@ -15,7 +15,7 @@ class DebtAckPoster
 
     public function postDebtAck(Debt $debt, string $user)
     {
-        $message = sprintf("La dette de <@%s> vient d'etre marquée comme payé par <@%s>!", $debt->getAuthor(), $user);
+        $message = sprintf("La dette de <@%s> vient d'etre marquée comme payé par <@%s> !", $debt->getAuthor(), $user);
 
         $this->messagePoster->postMessage($message);
     }

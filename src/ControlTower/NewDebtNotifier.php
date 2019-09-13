@@ -16,34 +16,32 @@ class NewDebtNotifier
 
     public function notifiyNewDebt(Debt $debt)
     {
-        $this->messagePoster->postMessage($this->buildText($debt), $this->buildBlocks($debt));
-    }
-
-    private function buildText(Debt $debt): string
-    {
-        $event = $debt->getEvent();
-
-        if ('message' === $event->getType()) {
-            return sprintf("<@%s> a laissé un message: \n>>>%s", $event->getAuthor(), $event->getContent());
-        }
-
-        if ('reaction_added' === $event->getType()) {
-            return sprintf("<@%s> réagit à un message: \n>>>%s", $event->getAuthor(), $event->getContent());
-        }
-
-        throw new \RuntimeException('The type is not supported.');
+        $this->messagePoster->postMessage('Fraude détectée', $this->buildBlocks($debt));
     }
 
     private function buildBlocks(Debt $debt): array
     {
         $event = $debt->getEvent();
+
+        $explanation = '';
+
+        if ('message' === $event->getType()) {
+            $explanation = 'message posté';
+        } elseif ('reaction_added' === $event->getType()) {
+            $explanation = sprintf('réaction "%s" ajoutée', $event->getContent());
+        }
+
+        if ($explanation) {
+            $explanation = sprintf(' Raison : %s.', $explanation);
+        }
+
         $blocks = [
             [
                 'type' => 'context',
                 'elements' => [
                     [
                         'type' => 'mrkdwn',
-                        'text' => sprintf('Merci <@%s> pour le prochain petit dej!', $event->getAuthor()),
+                        'text' => sprintf('Merci <@%s> pour le prochain petit dej !%s', $event->getAuthor(), $explanation),
                     ],
                 ],
             ],
