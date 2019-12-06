@@ -25,7 +25,7 @@ class DebtListBlockBuilder
                     'type' => 'section',
                     'text' => [
                         'type' => 'mrkdwn',
-                        'text' => '*Il n\'y a plus de dette*',
+                        'text' => '*Il n\'y a plus de dettes*',
                     ],
                 ],
             ];
@@ -56,7 +56,7 @@ class DebtListBlockBuilder
                     'type' => 'button',
                     'text' => [
                         'type' => 'plain_text',
-                        'text' => 'Marquer comme payé',
+                        'text' => 'Marquer comme payée',
                         'emoji' => true,
                     ],
                     'value' => 'ack-'.$debt->getId(),
