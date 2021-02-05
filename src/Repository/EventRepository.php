@@ -25,6 +25,7 @@ class EventRepository extends ServiceEntityRepository
             ->createQueryBuilder('e')
             ->andWhere('e.createdAt >= :day')->setParameter('day', $event->getCreatedAt()->format('Y-m-d'))
             ->andWhere('e.createdAt < :eventDate')->setParameter('eventDate', $event->getCreatedAt()->format('Y-m-d H:i:s.v'))
+            ->addOrderBy('e.createdAt', 'ASC')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult()
