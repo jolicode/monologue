@@ -14,12 +14,16 @@
 * Set permission on bot
     * `commands`
     * `channels:history`
+    * `chat:write`
 * Interactivity
     * https://85c74d33d1af.ngrok.io/action
 * Slack command
     * Command: /monolog
-    * Request URL: https://85c74d33d1af.ngrok.io/command/list
-    * Short Description: List all Debts
+        * Request URL: https://85c74d33d1af.ngrok.io/command/list
+        * Short Description: List all Debts
+    * Command: /amnistie
+        * Request URL: https://85c74d33d1af.ngrok.io/command/amnesty
+        * Short Description: Demande une amnistie générale
 * Event Subscription
     * URL: https://85c74d33d1af.ngrok.io/message
     * Events:

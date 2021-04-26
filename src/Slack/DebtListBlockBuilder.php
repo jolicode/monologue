@@ -64,6 +64,20 @@ class DebtListBlockBuilder
             ];
         }
 
+        if (\count($blocks) >= 50) {
+            $blocks = array_slice($blocks, 47);
+            $blocks[] = [
+                'type' => 'divider',
+            ];
+            $blocks[] =  [
+                'type' => 'section',
+                'text' => [
+                    'type' => 'mrkdwn',
+                    'text' => 'Il y a plus de dettes, mais slack ne peut en afficher que 50. Il est temps de demander une amnistie?',
+                ],
+            ];
+        }
+
         return $blocks;
     }
 }

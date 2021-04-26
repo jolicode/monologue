@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Amnesty
 {
-    private const THRESHOLD = 2;
+    private const THRESHOLD = 5;
 
     /**
      * @ORM\Id()
