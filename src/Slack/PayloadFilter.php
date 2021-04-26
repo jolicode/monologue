@@ -26,6 +26,10 @@ class PayloadFilter
             if (($e['subtype'] ?? false) && 'me_message' !== $e['subtype'] && 'file_share' !== $e['subtype']) {
                 return false;
             }
+            // Bot
+            if ($e['bot_profile'] ?? false) {
+                return false;
+            }
             // Slack Command
             if ('/' === mb_substr($e['text'], 0, 1)) {
                 return false;

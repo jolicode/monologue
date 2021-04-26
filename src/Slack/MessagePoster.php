@@ -46,5 +46,15 @@ class MessagePoster
 
             throw new \RuntimeException('Posting message to slack failed.');
         }
+
+        if (!$response->toArray()['ok']) {
+            $this->logger->error('Posting message to slack failed.', [
+                'response' => $response,
+                'responseDecoded' => $response->toArray(),
+                'text' => $text,
+            ]);
+
+            throw new \RuntimeException('Posting message to slack failed.');
+        }
     }
 }
