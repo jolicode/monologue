@@ -5,8 +5,8 @@ namespace App\Repository;
 use App\Entity\Debt;
 use App\Entity\Event;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method Debt|null find($id, $lockMode = null, $lockVersion = null)
@@ -42,6 +42,19 @@ class DebtRepository extends ServiceEntityRepository
             ->addOrderBy('d.author', 'ASC')
             ->getQuery()
             ->getResult()
+        ;
+    }
+
+    public function ackAllDebts()
+    {
+        return $this
+            ->createQueryBuilder('d')
+            ->update()
+            ->andWhere('d.paid = :paid')->setParameter('paid', false)
+            ->set('d.paid', ':newPaid')->setParameter('newPaid', true)
+            ->set('d.paidAt', ':newPaidAt')->setParameter('newPaidAt', new \DateTimeImmutable())
+            ->getQuery()
+            ->execute()
         ;
     }
 }

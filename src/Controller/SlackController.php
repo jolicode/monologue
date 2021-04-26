@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\ControlTower\BigBrowser;
 use App\ControlTower\DebtAcker;
+use App\ControlTower\Government;
 use App\Slack\DebtAckPoster;
 use App\Slack\DebtListBlockBuilder;
 use App\Slack\DebtListPoster;
@@ -20,20 +21,22 @@ class SlackController extends AbstractController
 {
     private $bigBrowser;
     private $debtAcker;
-    private $debtListBlockBuider;
+    private $debtListBlockBuilder;
     private $debtListPoster;
     private $em;
     private $debAckPoster;
+    private $government;
     private $logger;
 
-    public function __construct(BigBrowser $bigBrowser, DebtAcker $debtAcker, DebtListBlockBuilder $debtListBlockBuider, DebtListPoster $debtListPoster, EntityManagerInterface $em, DebtAckPoster $debAckPoster, ?LoggerInterface $logger = null)
+    public function __construct(BigBrowser $bigBrowser, DebtAcker $debtAcker, DebtListBlockBuilder $debtListBlockBuilder, DebtListPoster $debtListPoster, EntityManagerInterface $em, DebtAckPoster $debAckPoster, Government $government, ?LoggerInterface $logger = null)
     {
         $this->bigBrowser = $bigBrowser;
         $this->debtAcker = $debtAcker;
-        $this->debtListBlockBuider = $debtListBlockBuider;
+        $this->debtListBlockBuilder = $debtListBlockBuilder;
         $this->debtListPoster = $debtListPoster;
         $this->em = $em;
         $this->debAckPoster = $debAckPoster;
+        $this->government = $government;
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -75,11 +78,29 @@ class SlackController extends AbstractController
     }
 
     /** @Route("/command/list", methods="POST") */
-    public function commandList(Request $request)
+    public function commandList()
     {
         return $this->json([
             'text' => 'Dettes en attente', // Not used but mandatory
-            'blocks' => $this->debtListBlockBuider->buildBlocks(),
+            'blocks' => $this->debtListBlockBuilder->buildBlocks(),
+        ]);
+    }
+
+    /** @Route("/command/amnesty", methods="POST") */
+    public function commandAmnesty(Request $request)
+    {
+        try {
+            $this->government->redeem($request->request->get('user_id'));
+        } catch (\DomainException $e) {
+            return $this->json([
+                'text' => $e->getMessage(),
+            ]);
+        } finally {
+            $this->em->flush();
+        }
+
+        return $this->json([
+            'text' => 'Amnistie générale 🎆',
         ]);
     }
 }

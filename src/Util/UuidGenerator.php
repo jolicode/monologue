@@ -9,7 +9,7 @@ class UuidGenerator
     public static function v4()
     {
         if (\extension_loaded('uuid')) {
-            return strtolower(uuid_create(UUID_TYPE_RANDOM));
+            return strtolower(uuid_create(\UUID_TYPE_RANDOM));
         }
 
         return sprintf(

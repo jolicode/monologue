@@ -33,10 +33,10 @@ class SignatureSubscriber implements EventSubscriberInterface
 
         $payload = "v0:$timestamp:$body";
 
-        $signatureTmp = "v0=".hash_hmac('sha256', $payload, $this->signinSecret);
+        $signatureTmp = 'v0='.hash_hmac('sha256', $payload, $this->signinSecret);
 
         if ($signatureTmp !== $signature) {
-            $event->setResponse(new Response("You are not slack", 401));
+            $event->setResponse(new Response('You are not slack', 401));
         }
     }
 
