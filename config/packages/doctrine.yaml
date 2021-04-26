@@ -1,12 +1,12 @@
 doctrine:
     dbal:
-        server_version: '10'
+        override_url: true
         url: '%env(resolve:DATABASE_URL)%'
         types:
             datetime_immutable_ms: App\Doctrine\Type\DateTimeImmutableWithMillis
     orm:
         auto_generate_proxy_classes: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
             App:

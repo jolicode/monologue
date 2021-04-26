@@ -7,8 +7,7 @@ use App\ControlTower\DebtAcker;
 use App\Slack\DebtAckPoster;
 use App\Slack\DebtListBlockBuilder;
 use App\Slack\DebtListPoster;
-use App\Slack\MessagePoster;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +23,7 @@ class SlackController extends AbstractController
     private $em;
     private $debAckPoster;
 
-    public function __construct(BigBrowser $bigBrowser, DebtAcker $debtAcker, DebtListBlockBuilder $debtListBlockBuider, DebtListPoster $debtListPoster, ObjectManager $em, DebtAckPoster $debAckPoster)
+    public function __construct(BigBrowser $bigBrowser, DebtAcker $debtAcker, DebtListBlockBuilder $debtListBlockBuider, DebtListPoster $debtListPoster, EntityManagerInterface $em, DebtAckPoster $debAckPoster)
     {
         $this->bigBrowser = $bigBrowser;
         $this->debtAcker = $debtAcker;
