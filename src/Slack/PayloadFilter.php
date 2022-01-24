@@ -5,10 +5,12 @@ namespace App\Slack;
 class PayloadFilter
 {
     private $channel;
+    private $botIds;
 
-    public function __construct(string $channel)
+    public function __construct(string $channel, ?array $botIds = [])
     {
         $this->channel = $channel;
+        $this->botIds = $botIds ?? [];
     }
 
     public function isNewMessageOrReaction(array $payload): bool
@@ -18,11 +20,17 @@ class PayloadFilter
         }
 
         $e = $payload['event'];
+
+        $userId = $e['user'] ?? null;
+        if ($userId && in_array($userId, $this->botIds, true)) {
+            return false;
+        }
+
         if ('message' === $e['type']) {
             if ($this->channel !== $e['channel']) {
                 return false;
             }
-            // Bot, edit, ...
+            // Only handle special messages /me and file share (ignore others like bot message, channel join/leave, message edits, etc)
             if (($e['subtype'] ?? false) && 'me_message' !== $e['subtype'] && 'file_share' !== $e['subtype']) {
                 return false;
             }

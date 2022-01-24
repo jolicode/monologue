@@ -9,6 +9,7 @@ services:
             string $channel: "%env(SLACK_CHANNEL)%"
             string $token: "%env(SLACK_TOKEN)%"
             string $timezone: "%env(TIMEZONE)%"
+            array $botIds: "%env(json:SLACK_BOT_IDS)%"
 
     App\:
         resource: '../src/*'
