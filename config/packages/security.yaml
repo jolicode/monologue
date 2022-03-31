@@ -1,7 +1,7 @@
 security:
-    encoders:
-        Symfony\Component\Security\Core\User\User: plaintext
-
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser:
+            algorithm: plaintext
     providers:
         in_memory:
             memory:
@@ -14,7 +14,7 @@ security:
 
         home:
             pattern: ^/$
-            anonymous: false
             http_basic: true
 
     access_control:
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
