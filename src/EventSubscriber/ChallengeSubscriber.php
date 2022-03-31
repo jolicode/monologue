@@ -10,7 +10,7 @@ class ChallengeSubscriber implements EventSubscriberInterface
 {
     public function onRequestEvent(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -24,7 +24,7 @@ class ChallengeSubscriber implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RequestEvent::class => ['onRequestEvent', 1024],

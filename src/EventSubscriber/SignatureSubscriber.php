@@ -8,16 +8,13 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class SignatureSubscriber implements EventSubscriberInterface
 {
-    private $signinSecret;
-
-    public function __construct(string $signinSecret)
+    public function __construct(private string $signinSecret)
     {
-        $this->signinSecret = $signinSecret;
     }
 
     public function onRequestEvent(RequestEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 
@@ -40,7 +37,7 @@ class SignatureSubscriber implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             RequestEvent::class => ['onRequestEvent', 32 - 1],

@@ -8,11 +8,8 @@ use App\Util\UuidGenerator;
 
 class DebtAcker
 {
-    private $debtRepository;
-
-    public function __construct(DebtRepository $debtRepository)
+    public function __construct(private DebtRepository $debtRepository)
     {
-        $this->debtRepository = $debtRepository;
     }
 
     public function ackDebt(array $payload, string $debtId): Debt

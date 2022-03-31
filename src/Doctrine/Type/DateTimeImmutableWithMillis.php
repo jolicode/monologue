@@ -8,12 +8,12 @@ use Doctrine\DBAL\Types\Type;
 
 class DateTimeImmutableWithMillis extends Type
 {
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
         return 'TIMESTAMP(3) WITHOUT TIME ZONE';
     }
 
-    public function requiresSQLCommentHint(AbstractPlatform $platform)
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
     }
@@ -50,7 +50,7 @@ class DateTimeImmutableWithMillis extends Type
         return $val;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'datetime_immutable_ms';
     }

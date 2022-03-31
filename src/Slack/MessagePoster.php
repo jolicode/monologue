@@ -8,16 +8,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MessagePoster
 {
-    private $httpClient;
-    private $token;
-    private $channel;
-    private $logger;
-
-    public function __construct(HttpClientInterface $httpClient, string $token, string $channel, LoggerInterface $logger = null)
+    public function __construct(
+        private HttpClientInterface $httpClient,
+        private string $token,
+        private string $channel,
+        private ?LoggerInterface $logger = null
+    )
     {
-        $this->httpClient = $httpClient;
-        $this->token = $token;
-        $this->channel = $channel;
         $this->logger = $logger ?: new NullLogger();
     }
 

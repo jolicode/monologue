@@ -6,7 +6,7 @@ class UuidGenerator
 {
     const V4_REGEX = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
-    public static function v4()
+    public static function v4(): string
     {
         if (\extension_loaded('uuid')) {
             return strtolower(uuid_create(\UUID_TYPE_RANDOM));

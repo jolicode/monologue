@@ -4,13 +4,11 @@ namespace App\Slack;
 
 class DebtListPoster
 {
-    private $blockBuilder;
-    private $messagePoster;
-
-    public function __construct(DebtListBlockBuilder $blockBuilder, MessagePoster $messagePoster)
+    public function __construct(
+        private DebtListBlockBuilder $blockBuilder,
+        private MessagePoster $messagePoster
+    )
     {
-        $this->blockBuilder = $blockBuilder;
-        $this->messagePoster = $messagePoster;
     }
 
     public function postDebtList(string $responseUrl = null)

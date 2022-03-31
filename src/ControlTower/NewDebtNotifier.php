@@ -7,11 +7,8 @@ use App\Slack\MessagePoster;
 
 class NewDebtNotifier
 {
-    private $messagePoster;
-
-    public function __construct(MessagePoster $messagePoster)
+    public function __construct(private MessagePoster $messagePoster)
     {
-        $this->messagePoster = $messagePoster;
     }
 
     public function notifiyNewDebt(Debt $debt)
@@ -35,7 +32,7 @@ class NewDebtNotifier
             $explanation = sprintf(' Raison : %s.', $explanation);
         }
 
-        $blocks = [
+        return [
             [
                 'type' => 'context',
                 'elements' => [
@@ -46,7 +43,5 @@ class NewDebtNotifier
                 ],
             ],
         ];
-
-        return $blocks;
     }
 }

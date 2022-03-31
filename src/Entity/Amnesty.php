@@ -18,22 +18,22 @@ class Amnesty
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="guid")
      */
-    private $id;
+    private string $id;
 
     /**
      * @ORM\Column(type="date_immutable")
      */
-    private $date;
+    private \DateTimeImmutable $date;
 
     /**
      * @ORM\Column(type="json")
      */
-    private $userIds;
+    private array $userIds;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $redeemed;
+    private bool $redeemed;
 
     public function __construct()
     {

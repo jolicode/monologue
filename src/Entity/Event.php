@@ -13,19 +13,19 @@ class Event
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="guid")
      */
-    private $id;
+    private string $id;
 
     /** @ORM\Column(type="string", length=255) */
-    private $type;
+    private string $type;
 
     /** @ORM\Column(type="text") */
-    private $content;
+    private string $content;
 
     /** @ORM\Column(type="string", length=255) */
-    private $author;
+    private string $author;
 
     /** @ORM\Column(type="datetime_immutable_ms")*/
-    private $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     public function __construct(string $type, string $content, string $author, \DateTimeImmutable $createdAt)
     {

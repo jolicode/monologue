@@ -9,15 +9,11 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class Government
 {
-    private $amnestyRepository;
-    private $debtRepository;
-    private $em;
-
-    public function __construct(AmnestyRepository $amnestyRepository, DebtRepository $debtRepository, EntityManagerInterface $em)
+    public function __construct(
+        private AmnestyRepository $amnestyRepository,
+        private DebtRepository $debtRepository,
+        private EntityManagerInterface $em)
     {
-        $this->amnestyRepository = $amnestyRepository;
-        $this->debtRepository = $debtRepository;
-        $this->em = $em;
     }
 
     public function redeem(string $userId)

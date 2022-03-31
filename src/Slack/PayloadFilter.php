@@ -4,12 +4,11 @@ namespace App\Slack;
 
 class PayloadFilter
 {
-    private $channel;
-    private $botIds;
-
-    public function __construct(string $channel, ?array $botIds = [])
+    public function __construct(
+        private string $channel,
+        private ?array $botIds = null
+    )
     {
-        $this->channel = $channel;
         $this->botIds = $botIds ?? [];
     }
 

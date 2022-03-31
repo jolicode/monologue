@@ -6,11 +6,8 @@ use App\Entity\Debt;
 
 class DebtAckPoster
 {
-    private $messagePoster;
-
-    public function __construct(MessagePoster $messagePoster)
+    public function __construct(private MessagePoster $messagePoster)
     {
-        $this->messagePoster = $messagePoster;
     }
 
     public function postDebtAck(Debt $debt, string $user)

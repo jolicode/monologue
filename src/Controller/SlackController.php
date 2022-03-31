@@ -12,44 +12,37 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/** @Route("", defaults={"slack"=true}) */
+#[Route('', defaults: ['slack' => true])]
 class SlackController extends AbstractController
 {
-    private $bigBrowser;
-    private $debtAcker;
-    private $debtListBlockBuilder;
-    private $debtListPoster;
-    private $em;
-    private $debAckPoster;
-    private $government;
-    private $logger;
-
-    public function __construct(BigBrowser $bigBrowser, DebtAcker $debtAcker, DebtListBlockBuilder $debtListBlockBuilder, DebtListPoster $debtListPoster, EntityManagerInterface $em, DebtAckPoster $debAckPoster, Government $government, ?LoggerInterface $logger = null)
+    public function __construct(
+        private BigBrowser $bigBrowser,
+        private DebtAcker $debtAcker,
+        private DebtListBlockBuilder $debtListBlockBuilder,
+        private DebtListPoster $debtListPoster,
+        private EntityManagerInterface $em,
+        private DebtAckPoster $debAckPoster,
+        private Government $government,
+        private ?LoggerInterface $logger = null)
     {
-        $this->bigBrowser = $bigBrowser;
-        $this->debtAcker = $debtAcker;
-        $this->debtListBlockBuilder = $debtListBlockBuilder;
-        $this->debtListPoster = $debtListPoster;
-        $this->em = $em;
-        $this->debAckPoster = $debAckPoster;
-        $this->government = $government;
         $this->logger = $logger ?? new NullLogger();
     }
 
-    /** @Route("/message", methods="POST") */
-    public function messages(Request $request)
+    #[Route('/message', methods: 'POST')]
+    public function messages(Request $request): Response
     {
         $this->bigBrowser->control(json_decode((string) $request->getContent(), true));
 
         return new Response('OK');
     }
 
-    /** @Route("/action", methods="POST") */
-    public function action(Request $request)
+    #[Route('/action', methods: 'POST')]
+    public function action(Request $request): Response
     {
         $payload = json_decode($request->request->get('payload'), true);
         if (!$payload) {
@@ -77,8 +70,8 @@ class SlackController extends AbstractController
         return new Response('OK');
     }
 
-    /** @Route("/command/list", methods="POST") */
-    public function commandList()
+    #[Route('/command/list', methods: 'POST')]
+    public function commandList(): JsonResponse
     {
         return $this->json([
             'text' => 'Dettes en attente', // Not used but mandatory
@@ -86,8 +79,8 @@ class SlackController extends AbstractController
         ]);
     }
 
-    /** @Route("/command/amnesty", methods="POST") */
-    public function commandAmnesty(Request $request)
+    #[Route('/command/amnesty', methods: 'POST')]
+    public function commandAmnesty(Request $request): JsonResponse
     {
         try {
             $this->government->redeem($request->request->get('user_id'));

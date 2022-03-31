@@ -11,16 +11,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomepageController extends AbstractController
 {
-    private $eventRepository;
-    private $debtRepository;
-
-    public function __construct(EventRepository $eventRepository, DebtRepository $debtRepository)
+    public function __construct(
+        private EventRepository $eventRepository,
+        private DebtRepository $debtRepository
+    )
     {
-        $this->eventRepository = $eventRepository;
-        $this->debtRepository = $debtRepository;
     }
 
-    /** @Route("/", name="homepage") */
+    #[Route('/', name: 'homepage')]
     public function homepage(Request $request)
     {
         try {

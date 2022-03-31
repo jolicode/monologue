@@ -10,17 +10,12 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class DebtCreator
 {
-    private $em;
-    private $eventRepository;
-    private $debtRepository;
-    private $timezone;
-
-    public function __construct(EntityManagerInterface $em, EventRepository $eventRepository, DebtRepository $debtRepository, string $timezone)
+    public function __construct(
+        private EntityManagerInterface $em,
+        private EventRepository $eventRepository,
+        private DebtRepository $debtRepository,
+        private string $timezone)
     {
-        $this->em = $em;
-        $this->eventRepository = $eventRepository;
-        $this->debtRepository = $debtRepository;
-        $this->timezone = $timezone;
     }
 
     public function createDebtIfNeeded(array $payload): ?Debt

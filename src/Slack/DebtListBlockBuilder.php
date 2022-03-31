@@ -6,13 +6,11 @@ use App\Repository\DebtRepository;
 
 class DebtListBlockBuilder
 {
-    private $messagePoster;
-    private $debtRepository;
-
-    public function __construct(MessagePoster $messagePoster, DebtRepository $debtRepository)
+    public function __construct(
+        private MessagePoster $messagePoster,
+        private DebtRepository $debtRepository
+    )
     {
-        $this->messagePoster = $messagePoster;
-        $this->debtRepository = $debtRepository;
     }
 
     public function buildBlocks(): array

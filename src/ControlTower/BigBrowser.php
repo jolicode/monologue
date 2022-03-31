@@ -9,16 +9,12 @@ use Psr\Log\NullLogger;
 
 class BigBrowser
 {
-    private $payloadFilter;
-    private $debtCreator;
-    private $newDebtNotifier;
-    private $logger;
-
-    public function __construct(PayloadFilter $payloadFilter, DebtCreator $debtCreator, NewDebtNotifier $newDebtNotifier, LoggerInterface $logger = null)
+    public function __construct(
+        private PayloadFilter $payloadFilter,
+        private DebtCreator $debtCreator,
+        private NewDebtNotifier $newDebtNotifier,
+        private ?LoggerInterface $logger = null)
     {
-        $this->payloadFilter = $payloadFilter;
-        $this->debtCreator = $debtCreator;
-        $this->newDebtNotifier = $newDebtNotifier;
         $this->logger = $logger ?: new NullLogger();
     }
 

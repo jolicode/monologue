@@ -15,31 +15,31 @@ class Debt
      * @ORM\GeneratedValue(strategy="NONE")
      * @ORM\Column(type="guid")
      */
-    private $id;
+    private string $id;
 
     /**
      * @ORM\OneToOne(targetEntity="App\Entity\Event", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
-    private $event;
+    private Event $event;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Event", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
-    private $cause;
+    private Event $cause;
 
     /** @ORM\Column(type="string", length=255) */
-    private $author;
+    private string $author;
 
     /** @ORM\Column(type="date_immutable") */
-    private $createdAt;
+    private \DateTimeImmutable $createdAt;
 
     /** @ORM\Column(type="date_immutable", nullable=true) */
-    private $paidAt;
+    private \DateTimeImmutable $paidAt;
 
     /** @ORM\Column(type="boolean") */
-    private $paid;
+    private bool $paid;
 
     public function __construct(Event $event, Event $cause)
     {
