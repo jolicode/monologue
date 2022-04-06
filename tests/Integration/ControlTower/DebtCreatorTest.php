@@ -8,15 +8,15 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DebtCreatorTest extends KernelTestCase
 {
-    private $bigBrowser;
+    private DebtCreator|null $bigBrowser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = static::bootKernel();
         $container = $kernel->getContainer();
 
         $this->bigBrowser = $container->get(DebtCreator::class);
-        $container->get('doctrine.dbal.default_connection')->exec('DELETE FROM event');
+        $container->get('doctrine.dbal.default_connection')->executeStatement('DELETE FROM event');
     }
 
     public function testControlFirstMessage()

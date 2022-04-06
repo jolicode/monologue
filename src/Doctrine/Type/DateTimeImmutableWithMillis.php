@@ -18,7 +18,7 @@ class DateTimeImmutableWithMillis extends Type
         return true;
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         if (null === $value) {
             return $value;
@@ -31,7 +31,7 @@ class DateTimeImmutableWithMillis extends Type
         throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue($value, AbstractPlatform $platform): null|\DateTimeInterface|\DateTimeImmutable
     {
         if (null === $value || $value instanceof \DateTimeInterface) {
             return $value;

@@ -1,6 +1,5 @@
 doctrine:
     dbal:
-        override_url: true
         url: '%env(resolve:DATABASE_URL)%'
         types:
             datetime_immutable_ms: App\Doctrine\Type\DateTimeImmutableWithMillis
