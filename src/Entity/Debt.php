@@ -2,43 +2,36 @@
 
 namespace App\Entity;
 
+use App\Repository\DebtRepository;
 use App\Util\UuidGenerator;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\DebtRepository")
- */
+#[ORM\Entity(repositoryClass: DebtRepository::class)]
 class Debt
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="NONE")
-     * @ORM\Column(type="guid")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    #[ORM\Column(type: 'guid')]
     private string $id;
 
-    /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Event", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\OneToOne(targetEntity: Event::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Event $event;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Event", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
-     */
+    #[ORM\ManyToOne(targetEntity: Event::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Event $cause;
 
-    /** @ORM\Column(type="string", length=255) */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $author;
 
-    /** @ORM\Column(type="date_immutable") */
+    #[ORM\Column(type: 'date_immutable')]
     private \DateTimeImmutable $createdAt;
 
-    /** @ORM\Column(type="date_immutable", nullable=true) */
+    #[ORM\Column(type: 'date_immutable', nullable: true)]
     private \DateTimeImmutable $paidAt;
 
-    /** @ORM\Column(type="boolean") */
+    #[ORM\Column(type: 'boolean')]
     private bool $paid;
 
     public function __construct(Event $event, Event $cause)

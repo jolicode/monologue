@@ -2,29 +2,28 @@
 
 namespace App\Entity;
 
+use App\Repository\EventRepository;
 use App\Util\UuidGenerator;
 use Doctrine\ORM\Mapping as ORM;
 
-/** @ORM\Entity(repositoryClass="App\Repository\EventRepository") */
+#[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="NONE")
-     * @ORM\Column(type="guid")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'NONE')]
+    #[ORM\Column(type: 'guid')]
     private string $id;
 
-    /** @ORM\Column(type="string", length=255) */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $type;
 
-    /** @ORM\Column(type="text") */
+    #[ORM\Column(type: 'text')]
     private string $content;
 
-    /** @ORM\Column(type="string", length=255) */
+    #[ORM\Column(type: 'string', length: 255)]
     private string $author;
 
-    /** @ORM\Column(type="datetime_immutable_ms")*/
+    #[ORM\Column(type: 'datetime_immutable_ms')]
     private \DateTimeImmutable $createdAt;
 
     public function __construct(string $type, string $content, string $author, \DateTimeImmutable $createdAt)
