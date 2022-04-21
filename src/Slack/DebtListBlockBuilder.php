@@ -9,8 +9,7 @@ class DebtListBlockBuilder
     public function __construct(
         private MessagePoster $messagePoster,
         private DebtRepository $debtRepository
-    )
-    {
+    ) {
     }
 
     public function buildBlocks(): array
@@ -57,17 +56,17 @@ class DebtListBlockBuilder
                         'text' => 'Marquer comme payée',
                         'emoji' => true,
                     ],
-                    'value' => 'ack-'.$debt->getId(),
+                    'value' => 'ack-' . $debt->getId(),
                 ],
             ];
         }
 
         if (\count($blocks) >= 50) {
-            $blocks = array_slice($blocks, 47);
+            $blocks = \array_slice($blocks, 47);
             $blocks[] = [
                 'type' => 'divider',
             ];
-            $blocks[] =  [
+            $blocks[] = [
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',

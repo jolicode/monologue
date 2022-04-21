@@ -17,3 +17,7 @@
 ###< symfony/phpunit-bridge ###
 /.serverless/
 /serverless.yml
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###

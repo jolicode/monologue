@@ -44,7 +44,7 @@ class DebtCreator
             throw new \RuntimeException('The type is not supported.');
         }
 
-        $date = new \DateTimeImmutable('@'.$e['event_ts']);
+        $date = new \DateTimeImmutable('@' . $e['event_ts']);
         $date = $date->setTimezone(new \DateTimeZone($this->timezone));
         $event = new Event($e['type'], $text, $e['user'], $date);
 
