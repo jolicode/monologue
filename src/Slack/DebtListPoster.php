@@ -7,8 +7,7 @@ class DebtListPoster
     public function __construct(
         private DebtListBlockBuilder $blockBuilder,
         private MessagePoster $messagePoster
-    )
-    {
+    ) {
     }
 
     public function postDebtList(string $responseUrl = null)

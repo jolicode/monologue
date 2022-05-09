@@ -13,8 +13,7 @@ class MessagePoster
         private string $token,
         private string $channel,
         private ?LoggerInterface $logger = null
-    )
-    {
+    ) {
         $this->logger = $logger ?: new NullLogger();
     }
 
@@ -22,7 +21,7 @@ class MessagePoster
     {
         $headers = [
             'headers' => [
-                'Authorization' => 'Bearer '.$this->token,
+                'Authorization' => 'Bearer ' . $this->token,
             ],
             'json' => [
                 'channel' => $this->channel,

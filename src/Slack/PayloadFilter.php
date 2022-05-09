@@ -7,8 +7,7 @@ class PayloadFilter
     public function __construct(
         private string $channel,
         private ?array $botIds = null
-    )
-    {
+    ) {
         $this->botIds = $botIds ?? [];
     }
 
@@ -21,7 +20,7 @@ class PayloadFilter
         $e = $payload['event'];
 
         $userId = $e['user'] ?? null;
-        if ($userId && in_array($userId, $this->botIds, true)) {
+        if ($userId && \in_array($userId, $this->botIds, true)) {
             return false;
         }
 

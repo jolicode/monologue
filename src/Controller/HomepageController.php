@@ -14,8 +14,7 @@ class HomepageController extends AbstractController
     public function __construct(
         private EventRepository $eventRepository,
         private DebtRepository $debtRepository
-    )
-    {
+    ) {
     }
 
     #[Route('/', name: 'homepage')]
