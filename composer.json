@@ -14,7 +14,7 @@
         "symfony/console": "*",
         "symfony/css-selector": "*",
         "symfony/dotenv": "*",
-        "symfony/flex": "^1.12.2",
+        "symfony/flex": "^2.0",
         "symfony/framework-bundle": "*",
         "symfony/http-client": "*",
         "symfony/maker-bundle": "^1.13",
@@ -78,7 +78,8 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.0.*"
+            "require": "6.2.*"
         }
-    }
+    },
+    "minimum-stability": "beta"
 }
