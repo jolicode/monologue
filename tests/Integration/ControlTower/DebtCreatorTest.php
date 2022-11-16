@@ -8,15 +8,16 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class DebtCreatorTest extends KernelTestCase
 {
-    private DebtCreator|null $bigBrowser;
+    private DebtCreator $bigBrowser;
 
     protected function setUp(): void
     {
-        $kernel = static::bootKernel();
-        $container = $kernel->getContainer();
+        $this->bigBrowser = self::getContainer()->get(DebtCreator::class);
 
-        $this->bigBrowser = $container->get(DebtCreator::class);
-        $container->get('doctrine.dbal.default_connection')->executeStatement('DELETE FROM event');
+        self::getContainer()
+            ->get('doctrine.dbal.default_connection')
+            ->executeStatement('DELETE FROM event')
+        ;
     }
 
     public function testControlFirstMessage()
@@ -34,7 +35,7 @@ class DebtCreatorTest extends KernelTestCase
                 'user' => 'foobar',
                 'ts' => '1567006789.003100',
                 'team' => 'T0FLD8LEM',
-                'channel' => 'CMFMZDBRR',
+                'channel' => 'MY_CHANNEL_ID',
                 'event_ts' => '1567006789.003100',
                 'channel_type' => 'channel',
             ],
@@ -61,7 +62,7 @@ class DebtCreatorTest extends KernelTestCase
                 'user' => 'foobar',
                 'ts' => '1567006790.003100',
                 'team' => 'T0FLD8LEM',
-                'channel' => 'CMFMZDBRR',
+                'channel' => 'MY_CHANNEL_ID',
                 'event_ts' => '1567006790.003100',
                 'channel_type' => 'channel',
             ],
@@ -88,7 +89,7 @@ class DebtCreatorTest extends KernelTestCase
                 'user' => 'baz',
                 'ts' => '1567006790.003100',
                 'team' => 'T0FLD8LEM',
-                'channel' => 'CMFMZDBRR',
+                'channel' => 'MY_CHANNEL_ID',
                 'event_ts' => '1567006790.003100',
                 'channel_type' => 'channel',
             ],
@@ -115,7 +116,7 @@ class DebtCreatorTest extends KernelTestCase
                 'user' => 'baz',
                 'ts' => '1567006791.003100',
                 'team' => 'T0FLD8LEM',
-                'channel' => 'CMFMZDBRR',
+                'channel' => 'MY_CHANNEL_ID',
                 'event_ts' => '1567006791.003100',
                 'channel_type' => 'channel',
             ],
@@ -142,7 +143,7 @@ class DebtCreatorTest extends KernelTestCase
                 'user' => 'foobar',
                 'ts' => '1567006791.603100',
                 'team' => 'T0FLD8LEM',
-                'channel' => 'CMFMZDBRR',
+                'channel' => 'MY_CHANNEL_ID',
                 'event_ts' => '1567006791.603100',
                 'channel_type' => 'channel',
             ],
@@ -169,7 +170,7 @@ class DebtCreatorTest extends KernelTestCase
                 'user' => 'foo',
                 'ts' => '1567006792.003100',
                 'team' => 'T0FLD8LEM',
-                'channel' => 'CMFMZDBRR',
+                'channel' => 'MY_CHANNEL_ID',
                 'event_ts' => '1567006792.003100',
                 'channel_type' => 'channel',
             ],
@@ -186,26 +187,26 @@ class DebtCreatorTest extends KernelTestCase
         // Reaction, author Jean, later
 
         $payload = [
-          'token' => '6X6M8tbvmeO3aOVAbjUopW2Y',
-          'team_id' => 'T0FLD8LEM',
-          'api_app_id' => 'AMV1PTJBH',
-          'event' => [
-            'type' => 'reaction_added',
-            'user' => 'Jean',
-            'item' => [
-              'type' => 'message',
-              'channel' => 'CMFMZDBRR',
-              'ts' => '1567006791.003100',
+            'token' => '6X6M8tbvmeO3aOVAbjUopW2Y',
+            'team_id' => 'T0FLD8LEM',
+            'api_app_id' => 'AMV1PTJBH',
+            'event' => [
+                'type' => 'reaction_added',
+                'user' => 'Jean',
+                'item' => [
+                    'type' => 'message',
+                    'channel' => 'MY_CHANNEL_ID',
+                    'ts' => '1567006791.003100',
+                ],
+                'reaction' => 'slightly_smiling_face',
+                'event_ts' => '1567006791.003100',
             ],
-            'reaction' => 'slightly_smiling_face',
-            'event_ts' => '1567006791.003100',
-          ],
-          'type' => 'event_callback',
-          'event_id' => 'EvMZ5HFMNC',
-          'event_time' => 1567525929,
-          'authed_users' => [
-            0 => 'U0FLDV6UW',
-          ],
+            'type' => 'event_callback',
+            'event_id' => 'EvMZ5HFMNC',
+            'event_time' => 1567525929,
+            'authed_users' => [
+                0 => 'U0FLDV6UW',
+            ],
         ];
 
         $this->assertInstanceOf(Debt::class, $this->bigBrowser->createDebtIfNeeded($payload));
@@ -213,26 +214,26 @@ class DebtCreatorTest extends KernelTestCase
         // Reaction, author Jean, later
 
         $payload = [
-          'token' => '6X6M8tbvmeO3aOVAbjUopW2Y',
-          'team_id' => 'T0FLD8LEM',
-          'api_app_id' => 'AMV1PTJBH',
-          'event' => [
-            'type' => 'reaction_added',
-            'user' => 'Jean',
-            'item' => [
-              'type' => 'message',
-              'channel' => 'CMFMZDBRR',
-              'ts' => '1567006792.003100',
+            'token' => '6X6M8tbvmeO3aOVAbjUopW2Y',
+            'team_id' => 'T0FLD8LEM',
+            'api_app_id' => 'AMV1PTJBH',
+            'event' => [
+                'type' => 'reaction_added',
+                'user' => 'Jean',
+                'item' => [
+                    'type' => 'message',
+                    'channel' => 'MY_CHANNEL_ID',
+                    'ts' => '1567006792.003100',
+                ],
+                'reaction' => 'slightly_smiling_face',
+                'event_ts' => '1567006792.003100',
             ],
-            'reaction' => 'slightly_smiling_face',
-            'event_ts' => '1567006792.003100',
-          ],
-          'type' => 'event_callback',
-          'event_id' => 'EvMZ5HFMNC',
-          'event_time' => 1567525929,
-          'authed_users' => [
-            0 => 'U0FLDV6UW',
-          ],
+            'type' => 'event_callback',
+            'event_id' => 'EvMZ5HFMNC',
+            'event_time' => 1567525929,
+            'authed_users' => [
+                0 => 'U0FLDV6UW',
+            ],
         ];
 
         $this->assertNull($this->bigBrowser->createDebtIfNeeded($payload));

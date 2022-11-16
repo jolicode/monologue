@@ -1,0 +1,34 @@
+display_information:
+  name: Monologue
+features:
+  bot_user:
+    display_name: Monologue
+    always_online: false
+  slash_commands:
+    - command: /monologue
+      url: https://exemple.com/command/list
+      description: List all debts
+      should_escape: false
+    - command: /amnesty
+      url: https://exemple.com/command/amnesty
+      description: Ask for general amnesty
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - channels:history
+      - chat:write
+      - commands
+      - reactions:read
+settings:
+  event_subscriptions:
+    request_url: https://exemple.com/message
+    bot_events:
+      - message.channels
+      - reaction_added
+  interactivity:
+    is_enabled: true
+    request_url: https://exemple.com/action
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

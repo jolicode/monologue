@@ -1,0 +1,7 @@
+[
+    {
+        "location": "App\\Tests\\Acceptance\\AcceptenceTest::testWithAck",
+        "message": "The \"Monolog\\Logger\" class is considered final. It may change without further notice as of its next major version. You should not extend it from \"Symfony\\Bridge\\Monolog\\Logger\".",
+        "count": 1
+    }
+]

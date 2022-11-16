@@ -7,13 +7,14 @@ use App\Slack\MessagePoster;
 
 class NewDebtNotifier
 {
-    public function __construct(private MessagePoster $messagePoster)
-    {
+    public function __construct(
+        private readonly MessagePoster $messagePoster,
+    ) {
     }
 
-    public function notifiyNewDebt(Debt $debt)
+    public function notifyNewDebt(Debt $debt): void
     {
-        $this->messagePoster->postMessage('Fraude détectée', $this->buildBlocks($debt));
+        $this->messagePoster->postMessage('Fraud detected.', $this->buildBlocks($debt));
     }
 
     private function buildBlocks(Debt $debt): array
@@ -23,13 +24,13 @@ class NewDebtNotifier
         $explanation = '';
 
         if ('message' === $event->getType()) {
-            $explanation = 'message posté';
+            $explanation = 'message posted';
         } elseif ('reaction_added' === $event->getType()) {
-            $explanation = sprintf('réaction "%s" ajoutée', $event->getContent());
+            $explanation = sprintf('reaction "%s" added', $event->getContent());
         }
 
         if ($explanation) {
-            $explanation = sprintf(' Raison : %s.', $explanation);
+            $explanation = sprintf(' Reason: %s.', $explanation);
         }
 
         return [
@@ -38,7 +39,7 @@ class NewDebtNotifier
                 'elements' => [
                     [
                         'type' => 'mrkdwn',
-                        'text' => sprintf('Merci <@%s> pour le prochain petit dej !%s', $event->getAuthor(), $explanation),
+                        'text' => sprintf('Thanks <@%s> for the next breakfast!%s', $event->getAuthor(), $explanation),
                     ],
                 ],
             ],

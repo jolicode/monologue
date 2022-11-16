@@ -4,23 +4,16 @@ services:
     _defaults:
         autowire: true
         autoconfigure: true
-        bind:
-            string $signinSecret: "%env(SLACK_SIGNING_SECRET)%"
-            string $channel: "%env(SLACK_CHANNEL)%"
-            string $token: "%env(SLACK_TOKEN)%"
-            string $timezone: "%env(TIMEZONE)%"
-            array $botIds: "%env(json:SLACK_BOT_IDS)%"
 
     App\:
         resource: '../src/*'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+when@test:
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
 
-    App\ControlTower\DebtCreator:
-        public: true
-
-    App\ControlTower\BigBrowser:
-        public: true
+        http_client:
+            class: Symfony\Component\HttpClient\MockHttpClient

@@ -9,6 +9,8 @@ use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * @extends ServiceEntityRepository<Debt>
+ *
  * @method Debt|null find($id, $lockMode = null, $lockVersion = null)
  * @method Debt|null findOneBy(array $criteria, array $orderBy = null)
  * @method Debt[]    findAll()
@@ -33,6 +35,9 @@ class DebtRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return Debt[]
+     */
     public function findPendings(): array
     {
         return $this
@@ -45,9 +50,9 @@ class DebtRepository extends ServiceEntityRepository
         ;
     }
 
-    public function ackAllDebts()
+    public function ackAllDebts(): void
     {
-        return $this
+        $this
             ->createQueryBuilder('d')
             ->update()
             ->andWhere('d.paid = :paid')->setParameter('paid', false)

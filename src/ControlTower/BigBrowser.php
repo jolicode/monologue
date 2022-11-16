@@ -10,12 +10,11 @@ use Psr\Log\NullLogger;
 class BigBrowser
 {
     public function __construct(
-        private PayloadFilter $payloadFilter,
-        private DebtCreator $debtCreator,
-        private NewDebtNotifier $newDebtNotifier,
-        private ?LoggerInterface $logger = null)
-    {
-        $this->logger = $logger ?: new NullLogger();
+        private readonly PayloadFilter $payloadFilter,
+        private readonly DebtCreator $debtCreator,
+        private readonly NewDebtNotifier $newDebtNotifier,
+        private readonly LoggerInterface $logger = new NullLogger(),
+    ) {
     }
 
     public function control(array $payload): ?Debt
@@ -33,9 +32,9 @@ class BigBrowser
         $debt = $this->debtCreator->createDebtIfNeeded($payload);
 
         if ($debt) {
-            $this->newDebtNotifier->notifiyNewDebt($debt);
+            $this->newDebtNotifier->notifyNewDebt($debt);
 
-            $this->logger->notice('A new debt has been created', [
+            $this->logger->notice('A new debt has been created.', [
                 'debt' => $debt,
             ]);
         }

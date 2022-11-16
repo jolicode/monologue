@@ -1,40 +1,27 @@
 <?php
 
-$finder = (new PhpCsFixer\Finder())
+$finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->exclude('var')
-    ->exclude('migrations')
-    ->exclude('node_modules')
-    ->exclude('config')
+    ->append([
+        __FILE__,
+        'rector.php',
+    ])
 ;
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
+        '@PHP74Migration' => true,
+        '@PhpCsFixer' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
-        'array_syntax' => ['syntax' => 'short'],
-        'combine_consecutive_unsets' => true,
+        'php_unit_internal_class' => false, // From @PhpCsFixer but we don't want it
+        'php_unit_test_class_requires_covers' => false, // From @PhpCsFixer but we don't want it
+        'phpdoc_add_missing_param_annotation' => false, // From @PhpCsFixer but we don't want it
         'concat_space' => ['spacing' => 'one'],
-        'heredoc_to_nowdoc' => true,
-        'list_syntax' => ['syntax' => 'short'],
-        'no_extra_blank_lines' => ['tokens' => array('break', 'continue', 'extra', 'return', 'throw', 'use', 'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block')],
-        'echo_tag_syntax' => ['format' => 'long'],
-        'no_unreachable_default_argument_value' => true,
-        'no_useless_else' => true,
-        'no_useless_return' => true,
-        'ordered_class_elements' => true,
-        'ordered_imports' => true,
-        'php_unit_construct' => true,
-        'php_unit_strict' => true,
-        'php_unit_test_class_requires_covers' => false,
-        'phpdoc_add_missing_param_annotation' => true,
-        'phpdoc_order' => true,
-        'semicolon_after_instruction' => true,
-        'strict_comparison' => true,
-        'strict_param' => true,
-        'yoda_style' => false,
-        ])
+        'ordered_class_elements' => true, // Symfony(PSR12) override the default value, but we don't want
+        'blank_line_before_statement' => true, // Symfony(PSR12) override the default value, but we don't want
+    ])
     ->setFinder($finder)
-    ->setCacheFile('.php-cs-fixer.cache') // forward compatibility with 3.x line
 ;
