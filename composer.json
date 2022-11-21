@@ -1,7 +1,7 @@
 {
     "name": "jolicode/monologue",
     "type": "project",
-    "license": "proprietary",
+    "license": "MIT",
     "minimum-stability": "beta",
     "prefer-stable": true,
     "require": {
@@ -19,6 +19,7 @@
         "symfony/framework-bundle": "6.2.*",
         "symfony/http-client": "6.2.*",
         "symfony/monolog-bundle": "^3.4",
+        "symfony/runtime": "6.2.*",
         "symfony/security-bundle": "6.2.*",
         "symfony/twig-bundle": "6.2.*",
         "symfony/yaml": "6.2.*"
