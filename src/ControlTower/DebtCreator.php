@@ -7,22 +7,24 @@ use App\Entity\Event;
 use App\Repository\DebtRepository;
 use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class DebtCreator
 {
     public function __construct(
-        private EntityManagerInterface $em,
-        private EventRepository $eventRepository,
-        private DebtRepository $debtRepository,
-        private string $timezone)
-    {
+        private readonly EntityManagerInterface $em,
+        private readonly EventRepository $eventRepository,
+        private readonly DebtRepository $debtRepository,
+        #[Autowire('%env(TIMEZONE)%')]
+        private readonly string $timezone,
+    ) {
     }
 
     public function createDebtIfNeeded(array $payload): ?Debt
     {
         $this->em->getConnection()->beginTransaction();
         $tableName = $this->em->getClassMetadata(Event::class)->getTableName();
-        $this->em->getConnection()->exec("LOCK $tableName IN ACCESS EXCLUSIVE MODE");
+        $this->em->getConnection()->exec("LOCK {$tableName} IN ACCESS EXCLUSIVE MODE");
 
         $event = $this->insertEvent($payload);
         $debt = $this->doCreateDebtIfNeeded($event);

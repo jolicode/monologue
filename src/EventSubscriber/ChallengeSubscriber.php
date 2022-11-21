@@ -8,14 +8,15 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class ChallengeSubscriber implements EventSubscriberInterface
 {
-    public function onRequestEvent(RequestEvent $event)
+    public function verifyChallenge(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
             return;
         }
 
-        $payload = json_decode((string) $event->getRequest()->getContent(), true);
-        if (!$payload) {
+        try {
+            $payload = json_decode($event->getRequest()->getContent(), true, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
             return;
         }
 
@@ -27,7 +28,7 @@ class ChallengeSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            RequestEvent::class => ['onRequestEvent', 1024],
+            RequestEvent::class => ['verifyChallenge', 1024],
         ];
     }
 }

@@ -2,13 +2,16 @@
 
 namespace App\Slack;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
 class PayloadFilter
 {
     public function __construct(
-        private string $channel,
-        private ?array $botIds = null
+        #[Autowire('%env(SLACK_CHANNEL)%')]
+        private readonly string $channel,
+        #[Autowire('%env(json:SLACK_BOT_IGNORED_IDS)%')]
+        private readonly array $botIgnoredIds = [],
     ) {
-        $this->botIds = $botIds ?? [];
     }
 
     public function isNewMessageOrReaction(array $payload): bool
@@ -20,7 +23,7 @@ class PayloadFilter
         $e = $payload['event'];
 
         $userId = $e['user'] ?? null;
-        if ($userId && \in_array($userId, $this->botIds, true)) {
+        if ($userId && \in_array($userId, $this->botIgnoredIds, true)) {
             return false;
         }
 
@@ -37,7 +40,7 @@ class PayloadFilter
                 return false;
             }
             // Slack Command
-            if ('/' === mb_substr($e['text'], 0, 1)) {
+            if ('/' === mb_substr((string) $e['text'], 0, 1)) {
                 return false;
             }
         } elseif ('reaction_added' === $e['type']) {

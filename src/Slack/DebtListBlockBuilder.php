@@ -7,12 +7,11 @@ use App\Repository\DebtRepository;
 class DebtListBlockBuilder
 {
     public function __construct(
-        private MessagePoster $messagePoster,
-        private DebtRepository $debtRepository
+        private readonly DebtRepository $debtRepository,
     ) {
     }
 
-    public function buildBlocks(): array
+    public function buildBlocks(string $usedId): array
     {
         $debts = $this->debtRepository->findPendings();
 
@@ -22,7 +21,7 @@ class DebtListBlockBuilder
                     'type' => 'section',
                     'text' => [
                         'type' => 'mrkdwn',
-                        'text' => '*Il n\'y a plus de dettes*',
+                        'text' => '*There are no more debts*',
                     ],
                 ],
             ];
@@ -33,7 +32,7 @@ class DebtListBlockBuilder
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => '*Dettes en cours*',
+                    'text' => '*Pending debts*',
                 ],
             ],
             [
@@ -43,22 +42,27 @@ class DebtListBlockBuilder
 
         foreach ($debts as $debt) {
             $event = $debt->getEvent();
-            $blocks[] = [
+            $block = [
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => sprintf('<@%s>, depuis %s jours.', $event->getAuthor(), (new \DateTime())->diff($event->getCreatedAt())->format('%a')),
+                    'text' => sprintf('<@%s>, %s days ago.', $event->getAuthor(), (new \DateTime())->diff($event->getCreatedAt())->format('%a')),
                 ],
-                'accessory' => [
+            ];
+
+            if ($debt->getAuthor() !== $usedId) {
+                $block['accessory'] = [
                     'type' => 'button',
                     'text' => [
                         'type' => 'plain_text',
-                        'text' => 'Marquer comme payée',
+                        'text' => 'Mark as paid',
                         'emoji' => true,
                     ],
                     'value' => 'ack-' . $debt->getId(),
-                ],
-            ];
+                ];
+            }
+
+            $blocks[] = $block;
         }
 
         if (\count($blocks) >= 50) {
@@ -70,7 +74,7 @@ class DebtListBlockBuilder
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => 'Il y a plus de dettes, mais slack ne peut en afficher que 50. Il est temps de demander une amnistie?',
+                    'text' => 'There is more debts, but slack can display only 50. It\'s time to ask for amnesty?',
                 ],
             ];
         }

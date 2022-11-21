@@ -2,18 +2,25 @@
 
 namespace App\EventSubscriber;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class SignatureSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private string $signinSecret)
-    {
+    public function __construct(
+        #[Autowire('%env(SLACK_SIGNING_SECRET)%')]
+        private readonly string $signinSecret,
+    ) {
     }
 
-    public function onRequestEvent(RequestEvent $event)
+    public function verifySignature(RequestEvent $event): void
     {
+        if (!$this->signinSecret) {
+            return;
+        }
+
         if (!$event->isMainRequest()) {
             return;
         }
@@ -28,7 +35,7 @@ class SignatureSubscriber implements EventSubscriberInterface
         $signature = $request->headers->get('X-Slack-Signature');
         $timestamp = $request->headers->get('X-Slack-Request-Timestamp');
 
-        $payload = "v0:$timestamp:$body";
+        $payload = "v0:{$timestamp}:{$body}";
 
         $signatureTmp = 'v0=' . hash_hmac('sha256', $payload, $this->signinSecret);
 
@@ -40,7 +47,7 @@ class SignatureSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            RequestEvent::class => ['onRequestEvent', 32 - 1],
+            RequestEvent::class => ['verifySignature', 32 - 1],
         ];
     }
 }

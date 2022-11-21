@@ -3,6 +3,6 @@
 set -e
 BASE=$(dirname $0)/..
 
-$BASE/bin/console doctrine:database:drop --force || true
-$BASE/bin/console doctrine:database:create
-$BASE/bin/console doctrine:migration:migrate -n
+$BASE/bin/console doctrine:database:drop --force --if-exists $@
+$BASE/bin/console doctrine:database:create --if-not-exists $@
+$BASE/bin/console doctrine:migration:migrate -n $@

@@ -4,20 +4,22 @@ namespace App\Slack;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MessagePoster
 {
     public function __construct(
-        private HttpClientInterface $httpClient,
-        private string $token,
-        private string $channel,
-        private ?LoggerInterface $logger = null
+        private readonly HttpClientInterface $httpClient,
+        #[Autowire('%env(SLACK_TOKEN)%')]
+        private readonly string $token,
+        #[Autowire('%env(SLACK_CHANNEL)%')]
+        private readonly string $channel,
+        private readonly LoggerInterface $logger = new NullLogger(),
     ) {
-        $this->logger = $logger ?: new NullLogger();
     }
 
-    public function postMessage(string $text, array $blocks = [], string $responseUrl = null)
+    public function postMessage(string $text, array $blocks = [], string $responseUrl = null): void
     {
         $headers = [
             'headers' => [

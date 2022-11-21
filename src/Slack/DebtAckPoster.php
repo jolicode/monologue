@@ -6,13 +6,15 @@ use App\Entity\Debt;
 
 class DebtAckPoster
 {
-    public function __construct(private MessagePoster $messagePoster)
-    {
+    public function __construct(
+        private readonly MessagePoster $messagePoster
+    ) {
     }
 
-    public function postDebtAck(Debt $debt, string $user)
+    public function postDebtAck(Debt $debt, string $user): void
     {
         $message = sprintf("La dette de <@%s> vient d'etre marquée comme payé par <@%s> !", $debt->getAuthor(), $user);
+        $message = sprintf("<@%s>'s debt was marked as paid by <@%s> !", $debt->getAuthor(), $user);
 
         $this->messagePoster->postMessage($message);
     }

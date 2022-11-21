@@ -12,17 +12,17 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomepageController extends AbstractController
 {
     public function __construct(
-        private EventRepository $eventRepository,
-        private DebtRepository $debtRepository
+        private readonly EventRepository $eventRepository,
+        private readonly DebtRepository $debtRepository,
     ) {
     }
 
     #[Route('/', name: 'homepage')]
-    public function homepage(Request $request)
+    public function homepage(Request $request): Response
     {
         try {
-            $date = new \DateTimeImmutable($request->query->get('date'));
-        } catch (\Exception $e) {
+            $date = new \DateTimeImmutable((string) $request->query->get('date'));
+        } catch (\Exception) {
             return new Response('Bad date format.', 400);
         }
 

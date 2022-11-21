@@ -2,11 +2,12 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\InMemoryUser:
             algorithm: plaintext
+
     providers:
         in_memory:
             memory:
                 users:
-                    jolicode: { password: ouiiiiiiiiiiiiiiiiii }
+                    monologue: { password: '%env(DASHBOARD_PASSWORD)%' }
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -18,3 +19,12 @@ security:
 
     access_control:
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

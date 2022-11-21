@@ -1,0 +1,11 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Property App\\\\Entity\\\\Debt\\:\\:\\$paidAt is never read, only written\\.$#"
+			count: 1
+			path: src/Entity/Debt.php
+
+		-
+			message: "#^Property App\\\\Entity\\\\Event\\:\\:\\$id is never read, only written\\.$#"
+			count: 1
+			path: src/Entity/Event.php

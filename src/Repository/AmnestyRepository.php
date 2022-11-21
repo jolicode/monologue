@@ -7,6 +7,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
+ * @extends ServiceEntityRepository<Amnesty>
+ *
  * @method Amnesty|null find($id, $lockMode = null, $lockVersion = null)
  * @method Amnesty|null findOneBy(array $criteria, array $orderBy = null)
  * @method Amnesty[]    findAll()

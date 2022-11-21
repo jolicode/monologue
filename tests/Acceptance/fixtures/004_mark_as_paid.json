@@ -1,0 +1,46 @@
+{
+    "type": "block_actions",
+    "user": {
+        "id": "U0FLDV6UW",
+        "username": "lyrixx",
+        "name": "lyrixx",
+        "team_id": "T0FLD8LEM"
+    },
+    "api_app_id": "A04BWSZM1A4",
+    "token": "C2DjVO0acT24qkGx8mRhxYR0",
+    "container": {
+        "type": "message",
+        "message_ts": "1668617237.003200",
+        "channel_id": "MY_CHANNEL_ID",
+        "is_ephemeral": true
+    },
+    "trigger_id": "4384586712068.15693292497.41642ac54062a9a546eb281366dec37c",
+    "team": {
+        "id": "T0FLD8LEM",
+        "domain": "lyrixx"
+    },
+    "enterprise": null,
+    "is_enterprise_install": false,
+    "channel": {
+        "id": "MY_CHANNEL_ID",
+        "name": "monolog"
+    },
+    "state": {
+        "values": {}
+    },
+    "response_url": "https:\/\/hooks.slack.com\/actions\/T0FLD8LEM\/4375527081910\/uouQFvOW3NHFQjJmyAv53ZZF",
+    "actions": [
+        {
+            "action_id": "xFDNr",
+            "block_id": "iyd",
+            "text": {
+                "type": "plain_text",
+                "text": "Mark as paid",
+                "emoji": true
+            },
+            "value": "ack-DEBT_ID",
+            "type": "button",
+            "action_ts": "1668617768.535380"
+        }
+    ]
+}
