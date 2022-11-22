@@ -1,7 +1,7 @@
 # Monologue Bot
 
 At [JoliCode](https://jolicode.com/) we use [Slack](https://slack.com/) to
-communicate. And to bring fun to our daily life, we created a #monologue channel
+communicate. And to bring fun to our daily life, we created a *#monologue* channel
 where we can share our thoughts, our feelings, our dreams, our fears, our jokes,
 our memes, our pictures, our videos, our music, our links, our code, our life.
 But we have a special rule in this channel.
@@ -12,6 +12,11 @@ But we have a special rule in this channel.
 
 This bot is here to help us to respect this rule. It will post a message in the
 channel as soon as someone breaks the rule!
+
+![Monologue bot](https://jolicode.com/media/original/2022/monologue/monologue-1.jpg)
+![Monologue bot](https://jolicode.com/media/original/2022/monologue/monologue-2.jpg)
+
+If you want to get more information, you can read the [announce of the release](https://jolicode.com/blog/we-are-open-sourcing-a-silly-slack-bot-guess-what-it-does).
 
 ## Installation
 
