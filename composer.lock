@@ -5576,16 +5576,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v6.2.0-BETA1",
+            "version": "v6.2.0-BETA3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "b5fbe4feba6891de7ec1393b0282b13401a74049"
+                "reference": "d3cf3434b78f0ad3df846cebc552f745d01d90ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/b5fbe4feba6891de7ec1393b0282b13401a74049",
-                "reference": "b5fbe4feba6891de7ec1393b0282b13401a74049",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/d3cf3434b78f0ad3df846cebc552f745d01d90ee",
+                "reference": "d3cf3434b78f0ad3df846cebc552f745d01d90ee",
                 "shasum": ""
             },
             "require": {
@@ -5630,7 +5630,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v6.2.0-BETA1"
+                "source": "https://github.com/symfony/yaml/tree/v6.2.0-BETA3"
             },
             "funding": [
                 {
@@ -5646,7 +5646,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-10-09T08:55:43+00:00"
+            "time": "2022-11-14T09:35:55+00:00"
         },
         {
             "name": "twig/twig",
@@ -6117,7 +6117,9 @@
     ],
     "aliases": [],
     "minimum-stability": "beta",
-    "stability-flags": [],
+    "stability-flags": {
+        "symfony/yaml": 10
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
