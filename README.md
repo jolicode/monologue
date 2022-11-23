@@ -6,9 +6,9 @@ where we can share our thoughts, our feelings, our dreams, our fears, our jokes,
 our memes, our pictures, our videos, our music, our links, our code, our life.
 But we have a special rule in this channel.
 
-> This channel should only be used by one person per day. The others: no
-> message, no reaction, no change of subject, no deletion of message, no poll.
-> The pledge is to offer breakfast 🍪🍩🥐
+> Only **one person can use this channel per day**. The others cannot: no
+> message, no reaction, no changing the topic, no message deleting, no poll. The
+> pledge is to offer breakfast 🍪🍩🥐.
 
 This bot is here to help us to respect this rule. It will post a message in the
 channel as soon as someone breaks the rule!
