@@ -51,9 +51,9 @@ RUN apt-get update \
 RUN useradd -s /bin/false nginx
 
 # Configuration
-COPY --link php-configuration /etc/php/${PHP_VERSION}
-COPY --link etc/nginx/. /etc/nginx/
-COPY --link etc/service/. /etc/service/
+COPY php-configuration /etc/php/${PHP_VERSION}
+COPY etc/nginx/. /etc/nginx/
+COPY etc/service/. /etc/service/
 RUN phpenmod app-default \
     && phpenmod app-fpm
 
