@@ -63,9 +63,8 @@ Otherwise, you can follow the steps below:
 ### Install the PHP application
 
     docker-compose up -d
-    symfony server:start -d
-    symfony composer install
-    symfony run bin/db
+    docker-compose run --user=app frontend composer install
+    docker-compose run --user=app frontend bin/db
     # configure remaining parameters in .env.local
     # Enjoy
 

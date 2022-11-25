@@ -1,15 +1,25 @@
 version: '3.7'
 
+volumes:
+    postgres-data: {}
+
 services:
-    database:
-        image: 'postgres:15.1-alpine'
+    frontend:
+        build:
+            context: 'infrastructure/docker/services/frontend'
+            args:
+                - USER_ID=${UID:-1000}
+        depends_on:
+            - postgres
+        volumes:
+            - ".:/home/app/application:cached"
+            - "${COMPOSER_CACHE_DIR:-~/.cache/composer}:/home/app/.composer/cache"
+
+    postgres:
+        build: 'infrastructure/docker/services/postgres'
         environment:
-            POSTGRES_PASSWORD: main
-            POSTGRES_USER: main
-            POSTGRES_DB: main
-        ports:
-            # To allow the host machine to access the ports below, modify the lines below.
-            # For example, to allow the host to connect to port 5432 on the container, you would change
-            # "5432" to "5432:5432". Where the first port is exposed to the host and the second is the container port.
-            # See https://docs.docker.com/compose/compose-file/compose-file-v3/#ports for more information.
-            - '5432'
+            POSTGRES_PASSWORD: monologue
+            POSTGRES_USER: monologue
+            POSTGRES_DB: monologue
+        volumes:
+            - postgres-data:/var/lib/postgresql/data

@@ -13,32 +13,23 @@ jobs:
   phpunit:
     name: PHPUnit Test Suite
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: 'postgres:15.1-alpine'
-        env:
-            POSTGRES_DB: app
-            POSTGRES_USER: app
-            POSTGRES_PASSWORD: '!ChangeMe!'
-        ports:
-          - 5432:5432
+    env:
+      UID: 1001
     steps:
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: uuid, pdo_pgsql
-
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Build and Run Docker Stack
+        run: docker-compose up -d
+
       - name: Install Dependencies
-        run: composer install
+        run: docker-compose run --rm --user=app frontend composer install
 
       - name: Create Database
-        run: bin/db --env=test
+        run: docker-compose run --rm --user=app frontend bin/db --env=test
 
       - name: Execute tests
-        run: vendor/bin/simple-phpunit
+        run: docker-compose run --rm --user=app frontend vendor/bin/simple-phpunit
 
   check-cs:
     name: Check Coding Standards
