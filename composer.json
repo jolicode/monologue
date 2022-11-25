@@ -2,7 +2,7 @@
     "name": "jolicode/monologue",
     "type": "project",
     "license": "MIT",
-    "minimum-stability": "beta",
+    "minimum-stability": "rc",
     "prefer-stable": true,
     "require": {
         "php": ">=8.1",
