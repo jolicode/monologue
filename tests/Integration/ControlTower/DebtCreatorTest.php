@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Integration\ControlTower;
 
 use App\ControlTower\DebtCreator;
 use App\Entity\Debt;
