@@ -39,6 +39,6 @@ class Government
 
         $this->debtRepository->ackAllDebts();
 
-        $this->messagePoster->postMessage('The amnesty has been redeemed. All debts have been acknowledged. 🎆');
+        $this->messagePoster->postMessage('The amnesty has been redeemed. All debts have been wiped. 🎆');
     }
 }
