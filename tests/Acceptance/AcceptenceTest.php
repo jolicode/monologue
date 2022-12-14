@@ -157,7 +157,7 @@ class AcceptenceTest extends WebTestCase
         $mockHttpClient->setResponseFactory(function (string $method, string $url, array $options = []): MockResponse {
             $this->assertSame('POST', $method);
             $this->assertSame('https://slack.com/api/chat.postMessage', $url);
-            $this->assertSame('{"channel":"MY_CHANNEL_ID","text":"The amnesty has been redeemed. All debts have been acknowledged. \ud83c\udf86","blocks":[]}', $options['body']);
+            $this->assertSame('{"channel":"MY_CHANNEL_ID","text":"The amnesty has been redeemed. All debts have been wiped. \ud83c\udf86","blocks":[]}', $options['body']);
 
             return new MockResponse('{"ok": true}');
         });
