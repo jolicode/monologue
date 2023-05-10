@@ -1,8 +1,8 @@
 #syntax=docker/dockerfile:1.4
 
-FROM debian:11.0-slim
+FROM debian:11.7-slim
 
-ARG PHP_VERSION=8.1
+ARG PHP_VERSION=8.2
 ARG USER_ID=1000
 
 # Bare minmum for installing things
@@ -58,7 +58,7 @@ RUN phpenmod app-default \
     && phpenmod app-fpm
 
 # Build tools
-COPY --from=composer/composer:2.4.4-bin /composer /usr/bin/composer
+COPY --from=composer/composer:2.5.5-bin /composer /usr/bin/composer
 RUN mkdir -p "/home/app/.composer/cache" \
     && chown app: /home/app/.composer -R
 
