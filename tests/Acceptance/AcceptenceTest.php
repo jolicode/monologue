@@ -27,7 +27,7 @@ class AcceptenceTest extends WebTestCase
         // We want to be able to mock some response
         $client->disableReboot();
         /** @var MockHttpClient */
-        $mockHttpClient = self::getContainer()->get('http_client');
+        $mockHttpClient = self::getContainer()->get('http_client.transport');
 
         // #1 message from user A
 
@@ -128,7 +128,7 @@ class AcceptenceTest extends WebTestCase
         // We want to be able to mock some response
         $client->disableReboot();
         /** @var MockHttpClient */
-        $mockHttpClient = self::getContainer()->get('http_client');
+        $mockHttpClient = self::getContainer()->get('http_client.transport');
 
         // #1 message from user A
 
