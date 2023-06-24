@@ -62,17 +62,15 @@ Otherwise, you can follow the steps below:
 
 ### Install the PHP application
 
-    docker-compose up -d
-    docker-compose run --user=app --rm frontend composer install
-    docker-compose run --user=app --rm frontend bin/db
+This project uses [castor](https://github.com/jolicode/castor) to manage common
+tasks. It's not mandatory but it's easier with it.
+
     # configure remaining parameters in .env.local
-    # Enjoy
+    castor start
 
 ## Test
 
-    # Only for the first time
-    docker-compose run --user=app --rm frontend bin/db --env=test
-    docker-compose run --user=app --rm frontend bin/phpunit
+    castor qa:all
 
 ## Usage
 

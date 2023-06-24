@@ -22,4 +22,8 @@
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 
-/docker-compose.override.yml
+# Infra stuff
+/.castor.stub.php
+/infrastructure/docker/.env
+/infrastructure/docker/docker-compose.override.yml
+/infrastructure/docker/services/router/etc/ssl/certs/*
