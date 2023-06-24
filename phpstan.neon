@@ -4,6 +4,10 @@ parameters:
     level: 8
     paths:
         - src
+        - castor.php
+        - .castor/
+    scanFiles:
+        - .castor.stub.php
     tmpDir: 'var/phpstan/tmp'
     inferPrivatePropertyTypeFromConstructor: true
     excludePaths:
@@ -12,3 +16,21 @@ parameters:
         - '{Property .* type has no value type specified in iterable type array\.}'
         - '{Method .* return type has no value type specified in iterable type array\.}'
         - '{Method .* has parameter .* with no value type specified in iterable type array\.}'
+    typeAliases:
+        ContextData: '''
+            array{
+                project_name: int,
+                root_domain: int,
+                extra_domains: string[],
+                php_version: string,
+                project_directory: string,
+                docker_compose_files: string[],
+                project_directory: string,
+                macos: bool,
+                power_shell: bool,
+                user_id: int,
+                root_dir: string,
+                env: string,
+                composer_cache_dir: string,
+            }
+        '''
