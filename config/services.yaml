@@ -15,5 +15,5 @@ when@test:
             autowire: true
             autoconfigure: true
 
-        http_client:
+        http_client.transport:
             class: Symfony\Component\HttpClient\MockHttpClient
