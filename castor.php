@@ -24,11 +24,27 @@ function create_default_variables(): array
     ];
 }
 
+/**
+ * @return array<string, mixed>
+ */
+function create_default_environment(): array
+{
+    return [
+        'BUILDER_VERSION' => 'latest',
+        'FRONTEND_VERSION' => 'latest',
+        'ROUTER_VERSION' => 'latest',
+    ];
+}
+
 #[AsTask(description: 'Builds and starts the infrastructure, then install the application (composer, yarn, ...)')]
-function start(): void
+function start(bool $build = false): void
 {
     infra\generate_certificates(false);
-    infra\build();
+    if ($build) {
+        infra\build();
+    } else {
+        infra\pull();
+    }
     infra\up();
     cache_clear();
     install();

@@ -10,6 +10,7 @@ name: Continuous Integration
 
 permissions:
     contents: read
+    packages: read
 
 jobs:
     ci:
@@ -17,8 +18,17 @@ jobs:
         runs-on: ubuntu-latest
         env:
             BUILDKIT_PROGRESS: plain
+            DOCKER_BUILDKIT: 1
             CI: 1
         steps:
+            -
+                name: Log in to the Container registry
+                uses: docker/login-action@v2
+                with:
+                    registry: 'ghcr.io'
+                    username: ${{ github.actor }}
+                    password: ${{ secrets.GITHUB_TOKEN }}
+
             -
                 uses: actions/checkout@v3
 

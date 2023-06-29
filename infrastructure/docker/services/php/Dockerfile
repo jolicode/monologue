@@ -1,12 +1,16 @@
 FROM debian:11.7-slim as php-base
 
+LABEL org.opencontainers.image.source https://github.com/jolicode/monologue
+
 RUN apt-get update \
     && apt install -y --no-install-recommends \
         curl \
         ca-certificates \
         gnupg \
     && curl -s https://packages.sury.org/php/apt.gpg | gpg --dearmor > /usr/share/keyrings/deb.sury.org-php.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php bullseye main" > /etc/apt/sources.list.d/sury.list
+    && echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php bullseye main" > /etc/apt/sources.list.d/sury.list \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -33,14 +37,19 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 # Fake user to maps with the one on the host
+COPY entrypoint /
 ARG USER_ID
-RUN addgroup --gid 1000 app && \
-    adduser --system --uid $USER_ID --home /home/app --shell /bin/bash app
+RUN addgroup --gid $USER_ID app && \
+    adduser --system --uid $USER_ID --home /home/app --shell /bin/bash app && \
+    curl -Ls https://github.com/tianon/gosu/releases/download/1.16/gosu-amd64 | \
+        install /dev/stdin /usr/local/bin/gosu && \
+    sed "s/{{ application_user }}/app/g" -i /entrypoint
 
 # Configuration
 COPY base/php-configuration /etc/php/${PHP_VERSION}
 
 WORKDIR /home/app/application
+ENTRYPOINT [ "/entrypoint" ]
 
 FROM php-base as frontend
 
@@ -94,5 +103,3 @@ RUN mkdir -p "/home/app/.composer/cache" \
 
 ENV PATH="$PATH:/home/app/application/tools/php-cs-fixer/vendor/bin"
 ENV PATH="$PATH:/home/app/application/tools/phpstan/vendor/bin"
-
-USER app

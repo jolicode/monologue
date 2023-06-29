@@ -5,15 +5,27 @@ volumes:
 
 services:
     router:
-        build: services/router
+        image: "ghcr.io/jolicode/monologue/router:${ROUTER_VERSION:-latest}"
+        build:
+            context: services/router
+            # cache_to:
+            #     - "ghcr.io/jolicode/monologue/router:${ROUTER__VERSION:-latest}"
+            # cache_from:
+            #     - "ghcr.io/jolicode/monologue/router:${ROUTER__VERSION:-latest}"
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock"
+            - "./services/router/certs:/etc/ssl/certs"
         network_mode: host
 
     frontend:
+        image: "ghcr.io/jolicode/monologue/frontend:${FRONTEND_VERSION:-latest}"
         build:
             context: services/php
             target: frontend
+            # cache_to:
+            #     - "ghcr.io/jolicode/monologue/frontend:${FRONTEND_VERSION:-latest}"
+            # cache_from:
+            #     - "ghcr.io/jolicode/monologue/frontend:${FRONTEND_VERSION:-latest}"
         depends_on:
             - postgres
         volumes:
@@ -29,7 +41,7 @@ services:
             - "traefik.http.routers.${PROJECT_NAME}-frontend-unsecure.middlewares=redirect-to-https@file"
 
     postgres:
-        build: services/postgres
+        image: postgres:15.2
         environment:
             POSTGRES_PASSWORD: monologue
             POSTGRES_USER: monologue
