@@ -7,8 +7,7 @@ BASE=$(dirname $0)
 
 CERTS_DIR=$BASE/certs
 
-rm -rf mkdir $CERTS_DIR
-
+rm -rf $CERTS_DIR
 mkdir -p $CERTS_DIR
 
 openssl req -x509 -sha256 -newkey rsa:4096 \
