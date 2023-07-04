@@ -79,11 +79,23 @@ function destroy(
 
     docker_compose(['down', '--remove-orphans', '--volumes', '--rmi=local'], withBuilder: true);
     $files = finder()
-        ->in(variable('root_dir') . '/infrastructure/docker/services/router/etc/ssl/certs/')
+        ->in(variable('root_dir') . '/infrastructure/docker/services/router/certs/')
         ->name('*.pem')
         ->files()
     ;
     fs()->remove($files);
+}
+
+#[AsTask(description: 'Push images to the registry')]
+function push(): void
+{
+    docker_compose(['push'], withBuilder: true);
+}
+
+#[AsTask(description: 'Pull images from the registry')]
+function pull(): void
+{
+    docker_compose(['pull', '-q'], withBuilder: true);
 }
 
 #[AsTask(description: 'Generates SSL certificates (with mkcert if available or self-signed if not)')]
@@ -91,7 +103,7 @@ function generate_certificates(
     #[AsOption(description: 'Force the certificates re-generation without confirmation', shortcut: 'f')]
     bool $force = false,
 ): void {
-    if (file_exists(variable('root_dir') . '/infrastructure/docker/services/router/etc/ssl/certs/cert.pem') && !$force) {
+    if (file_exists(variable('root_dir') . '/infrastructure/docker/services/router/certs/cert.pem') && !$force) {
         io()->comment('SSL certificates already exists.');
         io()->note('Run "castor infra:generate-certificates --force" to generate new certificates.');
 
@@ -99,12 +111,12 @@ function generate_certificates(
     }
 
     if ($force) {
-        if (file_exists($f = variable('root_dir') . '/infrastructure/docker/services/router/etc/ssl/certs/cert.pem')) {
-            io()->comment('Removing existing certificates in infrastructure/docker/services/router/etc/ssl/certs/*.pem.');
+        if (file_exists($f = variable('root_dir') . '/infrastructure/docker/services/router/certs/cert.pem')) {
+            io()->comment('Removing existing certificates in infrastructure/docker/services/router/certs/*.pem.');
             unlink($f);
         }
 
-        if (file_exists($f = variable('root_dir') . '/infrastructure/docker/services/router/etc/ssl/certs/key.pem')) {
+        if (file_exists($f = variable('root_dir') . '/infrastructure/docker/services/router/certs/key.pem')) {
             unlink($f);
         }
     }
@@ -125,8 +137,8 @@ function generate_certificates(
 
         run([
             'mkcert',
-            '-cert-file', 'infrastructure/docker/services/router/etc/ssl/certs/cert.pem',
-            '-key-file', 'infrastructure/docker/services/router/etc/ssl/certs/key.pem',
+            '-cert-file', 'infrastructure/docker/services/router/certs/cert.pem',
+            '-key-file', 'infrastructure/docker/services/router/certs/key.pem',
             $rootDomain,
             "*.{$rootDomain}",
             ...variable('extra_domains'),
@@ -141,9 +153,9 @@ function generate_certificates(
         return;
     }
 
-    run(['infrastructure/docker/services/router/generate-ssl.sh']);
+    run(['infrastructure/docker/services/router/generate-ssl.sh'], quiet: true);
 
-    io()->success('Successfully generated self-signed SSL certificates in infrastructure/docker/services/router/etc/ssl/certs/*.pem.');
+    io()->success('Successfully generated self-signed SSL certificates in infrastructure/docker/services/router/certs/*.pem.');
     io()->comment('Consider installing mkcert to generate locally trusted SSL certificates and run "castor infra:generate-certificates --force".');
 
     if ($force) {

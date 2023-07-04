@@ -47,7 +47,7 @@ function about(): void
 }
 
 #[AsTask(description: 'Opens a shell (bash) into a builder container')]
-function builder(string $user = 'app'): void
+function builder(): void
 {
     $c = get_context()
         ->withTimeout(null)
@@ -56,7 +56,7 @@ function builder(string $user = 'app'): void
         ->withQuiet()
         ->withAllowFailure()
     ;
-    docker_compose_run('bash', c: $c, user: $user);
+    docker_compose_run('bash', c: $c);
 }
 
 #[AsContext(default: true)]
@@ -98,15 +98,18 @@ function create_default_context(): Context
         $data['user_id'] = 1000;
     }
 
-    // @phpstan-ignore-next-line
-    return new Context($data, pty: 'dev' === $data['env']);
+    return new Context(
+        // @phpstan-ignore-next-line
+        $data,
+        pty: 'dev' === $data['env'],
+        environment: create_default_environment(),
+    );
 }
 
 function docker_compose_run(
     string $runCommand,
     Context $c = null,
     string $service = 'builder',
-    string $user = 'app',
     bool $noDeps = true,
     string $workDir = null,
     bool $portMapping = false,
@@ -115,7 +118,6 @@ function docker_compose_run(
     $command = [
         'run',
         '--rm',
-        '-u', $user,
     ];
 
     if ($noDeps) {
@@ -156,9 +158,10 @@ function docker_compose(array $subCommand, Context $c = null, bool $withBuilder 
             'PROJECT_DIRECTORY' => variable('project_directory'),
             'PROJECT_ROOT_DOMAIN' => variable('root_domain'),
             'PROJECT_DOMAINS' => $domains,
+            'USER_ID' => variable('user_id'),
             'COMPOSER_CACHE_DIR' => variable('composer_cache_dir'),
             'PHP_VERSION' => variable('php_version'),
-        ], false)
+        ], true)
     ;
 
     $command = [

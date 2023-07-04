@@ -4,9 +4,10 @@
 
 BASE=$(dirname $0)
 
-rm -rf mkdir $BASE/certs/
 
-CERTS_DIR=$BASE/etc/ssl/certs
+CERTS_DIR=$BASE/certs
+
+rm -rf mkdir $CERTS_DIR
 
 mkdir -p $CERTS_DIR
 
