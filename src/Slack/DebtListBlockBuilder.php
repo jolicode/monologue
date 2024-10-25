@@ -66,7 +66,7 @@ class DebtListBlockBuilder
         }
 
         if (\count($blocks) >= 50) {
-            $blocks = \array_slice($blocks, 47);
+            $blocks = \array_slice($blocks, -47);
             $blocks[] = [
                 'type' => 'divider',
             ];
