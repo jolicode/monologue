@@ -16,7 +16,7 @@
         "symfony/framework-bundle": "6.3.*",
         "symfony/http-client": "6.3.*",
         "symfony/monolog-bundle": "^3.8",
-        "symfony/runtime": "6.3.*",
+        "symfony/runtime": "6.4.*",
         "symfony/security-bundle": "6.3.*",
         "symfony/twig-bundle": "6.3.*",
         "symfony/yaml": "6.3.*"
