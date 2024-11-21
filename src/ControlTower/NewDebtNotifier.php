@@ -26,11 +26,11 @@ class NewDebtNotifier
         if ('message' === $event->getType()) {
             $explanation = 'message posted';
         } elseif ('reaction_added' === $event->getType()) {
-            $explanation = sprintf('reaction "%s" added', $event->getContent());
+            $explanation = \sprintf('reaction "%s" added', $event->getContent());
         }
 
         if ($explanation) {
-            $explanation = sprintf(' Reason: %s.', $explanation);
+            $explanation = \sprintf(' Reason: %s.', $explanation);
         }
 
         return [
@@ -39,7 +39,7 @@ class NewDebtNotifier
                 'elements' => [
                     [
                         'type' => 'mrkdwn',
-                        'text' => sprintf('Thanks <@%s> for the next breakfast!%s', $event->getAuthor(), $explanation),
+                        'text' => \sprintf('Thanks <@%s> for the next breakfast!%s', $event->getAuthor(), $explanation),
                     ],
                 ],
             ],

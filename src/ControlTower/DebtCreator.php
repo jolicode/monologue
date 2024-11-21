@@ -24,7 +24,7 @@ class DebtCreator
     {
         $this->em->getConnection()->beginTransaction();
         $tableName = $this->em->getClassMetadata(Event::class)->getTableName();
-        $this->em->getConnection()->exec("LOCK {$tableName} IN ACCESS EXCLUSIVE MODE");
+        $this->em->getConnection()->executeStatement("LOCK {$tableName} IN ACCESS EXCLUSIVE MODE");
 
         $event = $this->insertEvent($payload);
         $debt = $this->doCreateDebtIfNeeded($event);

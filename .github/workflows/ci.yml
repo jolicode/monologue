@@ -1,56 +1,59 @@
 name: Continuous Integration
 
-'on':
+"on":
     push:
-        branches: [ "main" ]
+        branches: ["main"]
     pull_request:
-        branches: [ "main" ]
+        branches: ["main"]
     schedule:
-        - cron: '0 0 * * MON'
+        - cron: "0 0 * * MON"
 
 permissions:
     contents: read
     packages: read
 
+env:
+    # Fix for symfony/color detection. We know GitHub Actions can handle it
+    ANSICON: 1
+    CASTOR_CONTEXT: ci
+
 jobs:
+    check-dockerfiles:
+        name: Check Dockerfile
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Check php/Dockerfile
+              uses: hadolint/hadolint-action@v3.1.0
+              with:
+                  dockerfile: infrastructure/docker/services/php/Dockerfile
+
     ci:
         name: Continuous Integration
         runs-on: ubuntu-latest
-        env:
-            BUILDKIT_PROGRESS: plain
-            DOCKER_BUILDKIT: 1
-            CI: 1
         steps:
-            -
-                name: Log in to the Container registry
-                uses: docker/login-action@v2
-                with:
-                    registry: 'ghcr.io'
-                    username: ${{ github.actor }}
-                    password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Log in to the Container registry
+              uses: docker/login-action@v2
+              with:
+                  registry: 'ghcr.io'
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
 
-            -
-                uses: actions/checkout@v3
+            - uses: actions/checkout@v4
 
-            -
-                name: Setup PHP
-                uses: shivammathur/setup-php@v2
-                with:
-                    php-version: 8.2
-                    tools: jolicode/castor
+            - name: setup-castor
+              uses: castor-php/setup-castor@v0.1.0
 
-            -
-                name: 'Build and start the infrastructure'
-                run: castor start
+            - name: "Build and start the infrastructure"
+              run: "castor start"
 
-            -
-                name: 'Run PHP-CS-Fixer'
-                run: castor qa:cs --dry-run
+            - name: "Check PHP coding standards"
+              run: "castor qa:cs --dry-run"
 
-            -
-                name: 'Run PHPStan'
-                run: castor qa:phpstan
+            - name: "Run PHPStan"
+              run: "castor qa:phpstan"
 
-            -
-                name: 'Run PHPUnit'
-                run: castor qa:phpunit
+            - name: "Run PHPUnit"
+              run: "castor qa:phpunit"

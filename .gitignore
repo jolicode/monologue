@@ -24,6 +24,5 @@
 
 # Infra stuff
 /.castor.stub.php
-/infrastructure/docker/.env
 /infrastructure/docker/docker-compose.override.yml
-/infrastructure/docker/services/router/certs/*
+/infrastructure/docker/services/router/certs/*.pem

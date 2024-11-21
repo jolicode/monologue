@@ -31,7 +31,7 @@ class DateTimeImmutableWithMillis extends Type
         throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', \DateTime::class]);
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform): null|\DateTimeInterface|\DateTimeImmutable
+    public function convertToPHPValue($value, AbstractPlatform $platform): \DateTimeInterface|\DateTimeImmutable|null
     {
         if (null === $value || $value instanceof \DateTimeInterface) {
             return $value;
