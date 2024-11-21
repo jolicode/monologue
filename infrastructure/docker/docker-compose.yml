@@ -3,7 +3,6 @@ volumes:
 
 services:
     router:
-        image: "ghcr.io/jolicode/monologue/router:${ROUTER_VERSION:-latest}"
         build:
             context: services/router
             # cache_to:
@@ -23,7 +22,6 @@ services:
             - default
 
     frontend:
-        image: "ghcr.io/jolicode/monologue/frontend:${FRONTEND_VERSION:-latest}"
         build:
             context: services/php
             target: frontend

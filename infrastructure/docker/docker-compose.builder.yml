@@ -3,7 +3,6 @@ volumes:
 
 services:
     builder:
-        image: "ghcr.io/jolicode/monologue/builder:${BUILDER_VERSION:-latest}"
         build:
             context: services/php
             target: builder

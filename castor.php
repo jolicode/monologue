@@ -11,7 +11,6 @@ use function docker\about;
 use function docker\build;
 use function docker\docker_compose_run;
 use function docker\generate_certificates;
-use function docker\pull;
 use function docker\up;
 
 guard_min_version('0.18.0');
@@ -37,16 +36,12 @@ function create_default_variables(): array
 }
 
 #[AsTask(description: 'Builds and starts the infrastructure, then install the application (composer, yarn, ...)')]
-function start(bool $build = false): void
+function start(): void
 {
     io()->title('Starting the stack');
 
     generate_certificates(force: false);
-    if ($build) {
-        build();
-    } else {
-        pull();
-    }
+    build();
     up(profiles: ['default']); // We can't start worker now, they are not installed
     cache_clear();
     install();
