@@ -4,40 +4,66 @@ namespace qa;
 
 use Castor\Attribute\AsTask;
 
+use function Castor\io;
+use function Castor\variable;
+use function docker\docker_compose_run;
+use function docker\docker_exit_code;
+
 #[AsTask(description: 'Runs all QA tasks')]
-function all(): void
+function all(): int
 {
     install();
-    cs();
-    phpstan();
-    phpunit();
+    $cs = cs();
+    $phpstan = phpstan();
+    $phpunit = phpunit();
+
+    return max($cs, $phpstan, $phpunit);
 }
 
 #[AsTask(description: 'Installs tooling')]
 function install(): void
 {
-    docker_compose_run('composer install --working-dir tools/php-cs-fixer');
-    docker_compose_run('composer install --working-dir tools/phpstan');
+    io()->title('Installing QA tooling');
+
+    docker_compose_run('composer install -o', workDir: '/var/www/tools/php-cs-fixer');
+    docker_compose_run('composer install -o', workDir: '/var/www/tools/phpstan');
 }
 
-#[AsTask(description: 'Runs PHPStan')]
-function phpstan(): void
+#[AsTask(description: 'Update tooling')]
+function update(): void
 {
-    docker_compose_run('phpstan');
+    io()->title('Update QA tooling');
+
+    docker_compose_run('composer update -o', workDir: '/var/www/tools/php-cs-fixer');
+    docker_compose_run('composer update -o', workDir: '/var/www/tools/phpstan');
 }
 
-#[AsTask(description: 'Runs PHPUnit')]
-function phpunit(): void
+#[AsTask(description: 'Runs PHPUnit', aliases: ['phpunit'])]
+function phpunit(): int
 {
-    docker_compose_run('bin/phpunit');
+    return docker_exit_code('bin/phpunit');
 }
 
-#[AsTask(description: 'Fixes Coding Style')]
-function cs(bool $dryRun = false): void
+#[AsTask(description: 'Runs PHPStan', aliases: ['phpstan'])]
+function phpstan(): int
 {
-    if ($dryRun) {
-        docker_compose_run('php-cs-fixer fix --dry-run --diff');
-    } else {
-        docker_compose_run('php-cs-fixer fix');
+    if (!is_dir(variable('root_dir') . '/tools/phpstan/vendor')) {
+        install();
     }
+
+    return docker_exit_code('phpstan', workDir: '/var/www');
+}
+
+#[AsTask(description: 'Fixes Coding Style', aliases: ['cs'])]
+function cs(bool $dryRun = false): int
+{
+    if (!is_dir(variable('root_dir') . '/tools/php-cs-fixer/vendor')) {
+        install();
+    }
+
+    if ($dryRun) {
+        return docker_exit_code('php-cs-fixer fix --dry-run --diff', workDir: '/var/www');
+    }
+
+    return docker_exit_code('php-cs-fixer fix', workDir: '/var/www');
 }
