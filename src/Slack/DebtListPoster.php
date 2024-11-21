@@ -10,7 +10,7 @@ class DebtListPoster
     ) {
     }
 
-    public function postDebtList(string $userId, string $responseUrl = null): void
+    public function postDebtList(string $userId, ?string $responseUrl = null): void
     {
         $blocks = $this->blockBuilder->buildBlocks($userId);
 

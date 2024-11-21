@@ -19,7 +19,7 @@ class MessagePoster
     ) {
     }
 
-    public function postMessage(string $text, array $blocks = [], string $responseUrl = null): void
+    public function postMessage(string $text, array $blocks = [], ?string $responseUrl = null): void
     {
         $headers = [
             'headers' => [

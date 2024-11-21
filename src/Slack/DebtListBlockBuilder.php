@@ -46,7 +46,7 @@ class DebtListBlockBuilder
                 'type' => 'section',
                 'text' => [
                     'type' => 'mrkdwn',
-                    'text' => sprintf('<@%s>, %s days ago.', $event->getAuthor(), (new \DateTime())->diff($event->getCreatedAt())->format('%a')),
+                    'text' => \sprintf('<@%s>, %s days ago.', $event->getAuthor(), (new \DateTime())->diff($event->getCreatedAt())->format('%a')),
                 ],
             ];
 

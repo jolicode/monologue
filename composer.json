@@ -7,28 +7,28 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "doctrine/doctrine-bundle": "^2.10",
-        "doctrine/doctrine-migrations-bundle": "^3.2.4",
-        "doctrine/orm": "^2.15.3",
-        "symfony/console": "6.3.*",
-        "symfony/dotenv": "6.3.*",
-        "symfony/flex": "^2.3.1",
-        "symfony/framework-bundle": "6.3.*",
-        "symfony/http-client": "6.4.*",
-        "symfony/monolog-bundle": "^3.8",
-        "symfony/runtime": "6.4.*",
-        "symfony/security-bundle": "6.3.*",
-        "symfony/twig-bundle": "6.3.*",
-        "symfony/yaml": "6.3.*"
+        "doctrine/doctrine-bundle": "^2.13.1",
+        "doctrine/doctrine-migrations-bundle": "^3.3.1",
+        "doctrine/orm": "^2.20.0",
+        "symfony/console": "7.1.*",
+        "symfony/dotenv": "7.1.*",
+        "symfony/flex": "^2.4.7",
+        "symfony/framework-bundle": "7.1.*",
+        "symfony/http-client": "7.1.*",
+        "symfony/monolog-bundle": "^3.10",
+        "symfony/runtime": "7.1.*",
+        "symfony/security-bundle": "7.1.*",
+        "symfony/twig-bundle": "7.1.*",
+        "symfony/yaml": "7.1.*"
     },
     "require-dev": {
-        "symfony/browser-kit": "6.3.*",
-        "symfony/css-selector": "6.3.*",
-        "symfony/debug-bundle": "6.3.*",
-        "symfony/maker-bundle": "^1.49",
-        "symfony/phpunit-bridge": "6.3.*",
-        "symfony/stopwatch": "6.3.*",
-        "symfony/web-profiler-bundle": "6.3.*"
+        "symfony/browser-kit": "7.1.*",
+        "symfony/css-selector": "7.1.*",
+        "symfony/debug-bundle": "7.1.*",
+        "symfony/maker-bundle": "^1.61",
+        "symfony/phpunit-bridge": "7.1.*",
+        "symfony/stopwatch": "7.1.*",
+        "symfony/web-profiler-bundle": "7.1.*"
     },
     "replace": {
         "paragonie/random_compat": "2.*",
@@ -52,13 +52,14 @@
             "symfony/flex": true,
             "symfony/runtime": true
         },
+        "bump-after-update": true,
         "optimize-autoloader": true,
         "sort-packages": true
     },
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.3.*"
+            "require": "7.1.*"
         }
     },
     "autoload": {

@@ -1,5 +1,3 @@
-version: '3.7'
-
 volumes:
     builder-data: {}
 
@@ -13,13 +11,21 @@ services:
             #     - "ghcr.io/jolicode/monologue/builder:${BUILDER_VERSION:-latest}"
             # cache_from:
             #     - "ghcr.io/jolicode/monologue/builder:${BUILDER_VERSION:-latest}"
+        init: true
         depends_on:
             - postgres
         environment:
             - COMPOSER_MEMORY_LIMIT=-1
             - UID=${USER_ID}
+            # The following list contains the common environment variables exposed by CI platforms
             - GITHUB_ACTIONS
+            - CI # Travis CI, CircleCI, Cirrus CI, Gitlab CI, Appveyor, CodeShip, dsari
+            - CONTINUOUS_INTEGRATION # Travis CI, Cirrus CI
+            - BUILD_NUMBER # Jenkins, TeamCity
+            - RUN_ID # TaskCluster, dsari
         volumes:
-            - "../../${PROJECT_DIRECTORY}:/home/app/application:cached"
-            - "${COMPOSER_CACHE_DIR}:/home/app/.composer/cache"
             - "builder-data:/home/app"
+            - "${COMPOSER_CACHE_DIR}:/home/app/.composer/cache"
+            - "../..:/var/www:cached"
+        profiles:
+            - default

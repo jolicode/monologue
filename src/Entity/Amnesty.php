@@ -57,7 +57,7 @@ class Amnesty
         }
 
         if (($c = \count($this->userIds)) < $threshold) {
-            throw new \DomainException(sprintf('More people need to ask for amnesty to complete it! (%d/%d)', $c, $threshold));
+            throw new \DomainException(\sprintf('More people need to ask for amnesty to complete it! (%d/%d)', $c, $threshold));
         }
 
         $this->redeemed = true;
