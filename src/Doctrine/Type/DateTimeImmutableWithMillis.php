@@ -28,7 +28,7 @@ class DateTimeImmutableWithMillis extends Type
             return $value->format('Y-m-d H:i:s.v');
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', \DateTime::class]);
+        throw new ConversionException(sprintf('Expected \DateTimeInterface or null, got %s', get_debug_type($value)));
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): \DateTimeInterface|\DateTimeImmutable|null
@@ -44,7 +44,7 @@ class DateTimeImmutableWithMillis extends Type
         }
 
         if (!$val) {
-            throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeFormatString());
+            throw new ConversionException(sprintf('Could not convert database value "%s" to %s', get_debug_type($value), $this->getName()));
         }
 
         return $val;

@@ -4,6 +4,7 @@
 /.env.local
 /.env.local.php
 /.env.*.local
+/config/reference.php
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
@@ -22,7 +23,8 @@
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 
-# Infra stuff
+###> infrastructure ###
 /.castor.stub.php
 /infrastructure/docker/docker-compose.override.yml
 /infrastructure/docker/services/router/certs/*.pem
+###< infrastructure ###
