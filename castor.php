@@ -13,7 +13,7 @@ use function docker\docker_compose_run;
 use function docker\generate_certificates;
 use function docker\up;
 
-guard_min_version('0.18.0');
+guard_min_version('1.5.0');
 
 import(__DIR__ . '/.castor');
 
