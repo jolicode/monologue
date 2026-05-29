@@ -14,7 +14,7 @@ use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('', defaults: ['slack' => true])]
 class SlackController extends AbstractController
@@ -45,7 +45,7 @@ class SlackController extends AbstractController
     public function action(Request $request): Response
     {
         try {
-            $payload = json_decode((string) $request->request->get('payload'), true, 512, \JSON_THROW_ON_ERROR);
+            $payload = json_decode((string) $request->request->get('payload'), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             return new Response('No payload', 400);
         }

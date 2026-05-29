@@ -1,7 +1,6 @@
 # hadolint global ignore=DL3008
-FROM debian:12.6-slim AS php-base
 
-LABEL org.opencontainers.image.source https://github.com/jolicode/monologue
+FROM debian:13.5-slim AS php-base
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -12,7 +11,7 @@ RUN apt-get update \
         gnupg \
     && curl -sSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb \
     && dpkg -i /tmp/debsuryorg-archive-keyring.deb \
-    && echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php bookworm main" > /etc/apt/sources.list.d/sury.list \
+    && echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ trixie main" > /etc/apt/sources.list.d/sury.list \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
@@ -32,6 +31,7 @@ RUN apt-get update \
         "php${PHP_VERSION}-cli" \
         "php${PHP_VERSION}-common" \
         "php${PHP_VERSION}-curl" \
+        "php${PHP_VERSION}-gd" \
         "php${PHP_VERSION}-iconv" \
         "php${PHP_VERSION}-intl" \
         "php${PHP_VERSION}-mbstring" \
@@ -42,23 +42,14 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
-# Fake user to maps with the one on the host
-ARG USER_ID
-COPY entrypoint /
-RUN addgroup --gid $USER_ID app && \
-    adduser --system --uid $USER_ID --home /home/app --shell /bin/bash app && \
-    curl -Ls https://github.com/tianon/gosu/releases/download/1.17/gosu-amd64 | \
-        install /dev/stdin /usr/local/bin/gosu && \
-    sed "s/{{ application_user }}/app/g" -i /entrypoint
-
 # Configuration
 COPY base/php-configuration /etc/php/${PHP_VERSION}
 
 ENV PHP_VERSION=${PHP_VERSION}
+ENV HOME=/home/app
+ENV COMPOSER_MEMORY_LIMIT=-1
 
 WORKDIR /var/www
-
-ENTRYPOINT [ "/entrypoint" ]
 
 FROM php-base AS frontend
 
@@ -75,7 +66,9 @@ RUN useradd -s /bin/false nginx
 
 COPY frontend/php-configuration /etc/php/${PHP_VERSION}
 COPY frontend/etc/nginx/. /etc/nginx/
+RUN rm -rf /etc/service/
 COPY frontend/etc/service/. /etc/service/
+RUN chmod 777 /etc/service/*/supervise/
 
 RUN phpenmod app-default \
     && phpenmod app-fpm
@@ -84,39 +77,54 @@ EXPOSE 80
 
 CMD ["runsvdir", "-P", "/etc/service"]
 
+FROM php-base AS worker
+
 FROM php-base AS builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-ARG NODEJS_VERSION=20.x
+ARG NODEJS_VERSION=24.x
 RUN curl -s https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /usr/share/keyrings/nodesource.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODEJS_VERSION} nodistro main" > /etc/apt/sources.list.d/nodesource.list
 
 # Default toys
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        git \
-        make \
-        sudo \
-        unzip \
+        "git" \
+        "make" \
+        "nodejs" \
+        "php${PHP_VERSION}-dev" \
+        "sudo" \
+        "unzip" \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/* \
+    && corepack enable \
+    && yarn set version stable
+
+# Install a fake sudo command
+# This is commented out by default because it exposes a security risk if you use this image in production, but it may be useful for development
+# Use it at your own risk
+# COPY base/sudo.sh /usr/local/bin/sudo
+# RUN curl -L https://github.com/tianon/gosu/releases/download/1.16/gosu-amd64 -o /usr/local/bin/gosu && \
+#    chmod u+s /usr/local/bin/gosu && \
+#    chmod +x /usr/local/bin/gosu && \
+#    chmod +x /usr/local/bin/sudo
 
 # Config
-COPY builder/etc/. /etc/
 COPY builder/php-configuration /etc/php/${PHP_VERSION}
-RUN adduser app sudo \
-    && mkdir /var/log/php \
-    && chmod 777 /var/log/php \
-    && phpenmod app-default \
+RUN phpenmod app-default \
     && phpenmod app-builder
 
 # Composer
-COPY --from=composer/composer:2.8.2 /usr/bin/composer /usr/bin/composer
-RUN mkdir -p "/home/app/.composer/cache" \
-    && chown app: /home/app/.composer -R
+COPY --from=composer/composer:2.10.0 /usr/bin/composer /usr/bin/composer
 
-ADD https://raw.githubusercontent.com/symfony/symfony/refs/heads/7.2/src/Symfony/Component/Console/Resources/completion.bash /tmp/completion.bash
+# Pie
+RUN curl -L --output /usr/local/bin/pie https://github.com/php/pie/releases/download/1.4.5/pie.phar \
+    && chmod +x /usr/local/bin/pie
+
+# Autocompletion
+ADD https://raw.githubusercontent.com/symfony/symfony/refs/heads/7.4/src/Symfony/Component/Console/Resources/completion.bash /tmp/completion.bash
 
 # Composer symfony/console version is too old, and doest not support "API version feature", so we remove it
 # Hey, while we are at it, let's add some more completion

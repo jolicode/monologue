@@ -1,5 +1,6 @@
 includes:
     - phpstan-baseline.neon
+
 parameters:
     level: 8
     paths:
@@ -9,15 +10,15 @@ parameters:
         - .castor/
     scanFiles:
         - .castor.stub.php
+    # scanDirectories:
+    #     - vendor
     tmpDir: tools/phpstan/var
     inferPrivatePropertyTypeFromConstructor: true
     ignoreErrors:
-        - '{Property .* type has no value type specified in iterable type array\.}'
-        - '{Method .* return type has no value type specified in iterable type array\.}'
-        - '{Method .* has parameter .* with no value type specified in iterable type array\.}'
+        - identifier: missingType.iterableValue
 
     symfony:
-        container_xml_path: 'var/cache/dev/App_KernelDevDebugContainer.xml'
+        containerXmlPath: 'var/cache/dev/App_KernelDevDebugContainer.xml'
 
     typeAliases:
         ContextData: '''
@@ -25,13 +26,13 @@ parameters:
                 project_name: string,
                 root_domain: string,
                 extra_domains: string[],
-                project_directory: string,
                 php_version: string,
-                docker_compose_files: string[],
+                docker_compose_files: list<string>,
+                docker_compose_run_environment: list<string>,
                 macos: bool,
                 power_shell: bool,
                 user_id: int,
                 root_dir: string,
-                composer_cache_dir: string,
+                registry?: ?string,
             }
         '''

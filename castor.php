@@ -2,6 +2,7 @@
 
 use Castor\Attribute\AsTask;
 
+use function Castor\context;
 use function Castor\guard_min_version;
 use function Castor\import;
 use function Castor\io;
@@ -10,15 +11,17 @@ use function Castor\variable;
 use function docker\about;
 use function docker\build;
 use function docker\docker_compose_run;
-use function docker\generate_certificates;
 use function docker\up;
+
+// use function docker\workers_start;
+// use function docker\workers_stop;
 
 guard_min_version('1.5.0');
 
 import(__DIR__ . '/.castor');
 
 /**
- * @return array{project_name: string, root_domain: string, extra_domains: string[], php_version: string}
+ * @return array{project_name: string, root_domain: string}
  */
 function create_default_variables(): array
 {
@@ -28,10 +31,6 @@ function create_default_variables(): array
     return [
         'project_name' => $projectName,
         'root_domain' => "{$projectName}.{$tld}",
-        'extra_domains' => [
-            "www.{$projectName}.{$tld}",
-        ],
-        'php_version' => '8.3',
     ];
 }
 
@@ -40,13 +39,12 @@ function start(): void
 {
     io()->title('Starting the stack');
 
-    generate_certificates(force: false);
+    // workers_stop();
     build();
-    up(profiles: ['default']); // We can't start worker now, they are not installed
-    cache_clear();
     install();
+    up(profiles: ['default']); // We can't start worker now, they are not installed
     migrate();
-    migrate('test');
+    // workers_start();
 
     notify('The stack is now up and running.');
     io()->success('The stack is now up and running.');
@@ -67,7 +65,7 @@ function install(): void
     }
     if (is_file("{$basePath}/yarn.lock")) {
         io()->section('Installing Node.js dependencies');
-        docker_compose_run('yarn install --frozen-lockfile');
+        docker_compose_run('yarn install --immutable');
     } elseif (is_file("{$basePath}/package.json")) {
         io()->section('Installing Node.js dependencies');
 
@@ -85,31 +83,56 @@ function install(): void
     qa\install();
 }
 
-#[AsTask(description: 'Clear the application cache', namespace: 'app', aliases: ['cache-clear'])]
-function cache_clear(): void
+#[AsTask(description: 'Update dependencies')]
+function update(bool $withTools = false): void
+{
+    io()->title('Updating dependencies...');
+
+    docker_compose_run('composer update -o');
+
+    if ($withTools) {
+        qa\update();
+    }
+}
+
+#[AsTask(description: 'Clears the application cache', namespace: 'app', aliases: ['cache-clear'])]
+function cache_clear(bool $warm = true): void
 {
     io()->title('Clearing the application cache');
 
     docker_compose_run('rm -rf var/cache/');
-    // On the very first run, the vendor does not exist yet
-    if (is_dir(variable('root_dir') . '/vendor')) {
-        docker_compose_run('bin/console cache:warmup');
+
+    if ($warm) {
+        cache_warmup();
     }
 }
 
+#[AsTask(description: 'Warms the application cache', namespace: 'app', aliases: ['cache-warmup'])]
+function cache_warmup(): void
+{
+    io()->title('Warming the application cache');
+
+    docker_compose_run('bin/console cache:warmup', c: context()->withAllowFailure());
+}
+
 #[AsTask(description: 'Migrates database schema', namespace: 'app:db', aliases: ['migrate'])]
-function migrate(string $env = 'dev'): void
+function migrate(): void
 {
     io()->title('Migrating the database schema');
 
-    docker_compose_run('bin/console doctrine:database:create --if-not-exists --env=' . $env);
-    docker_compose_run('bin/console doctrine:migration:migrate -n --allow-no-migration --all-or-nothing --env=' . $env);
+    docker_compose_run('bin/console doctrine:database:create --if-not-exists');
+    docker_compose_run('bin/console doctrine:migration:migrate -n --allow-no-migration --all-or-nothing');
 }
 
-#[AsTask(description: 'Loads fixtures', namespace: 'app:db', aliases: ['fixture'])]
+#[AsTask(description: 'Loads fixtures', namespace: 'app:db', aliases: ['fixtures'])]
 function fixtures(): void
 {
-    io()->title('Loads fixtures');
+    io()->warning('This task is not implemented yet, you can use one of the following commands to load your fixtures:');
 
-    docker_compose_run('bin/console doctrine:fixture:load -n');
+    // io()->title('Loads fixtures');
+
+    // Uncomment one of them...
+    // docker_compose_run('bin/console doctrine:fixture:load -n');
+    // docker_compose_run('bin/console foundry:load-fixtures -n');
+    // docker_compose_run('bin/console sylius:fixture:load -n');
 }
