@@ -9,11 +9,10 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
-###> symfony/phpunit-bridge ###
-.phpunit
-.phpunit.result.cache
+###> phpunit/phpunit ###
 /phpunit.xml
-###< symfony/phpunit-bridge ###
+/.phpunit.cache/
+###< phpunit/phpunit ###
 
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.cache
@@ -27,3 +26,4 @@
 ###< infrastructure ###
 
 .twig-cs-fixer.cache
+
