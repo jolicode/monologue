@@ -48,13 +48,13 @@ function update(): void
 #[AsTask(description: 'Runs PHPUnit', aliases: ['phpunit'])]
 function phpunit(#[AsRawTokens] array $rawTokens = []): int
 {
-    if (!is_file(variable('root_dir') . '/bin/phpunit')) {
+    if (!is_file(variable('root_dir') . '/vendor/bin/phpunit')) {
         return 0;
     }
 
     io()->section('Running PHPUnit...');
 
-    return docker_exit_code('bin/phpunit ' . implode(' ', $rawTokens));
+    return docker_exit_code('vendor/bin/phpunit ' . implode(' ', $rawTokens));
 }
 
 #[AsTask(description: 'Runs PHPStan', aliases: ['phpstan'])]
