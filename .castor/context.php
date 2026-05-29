@@ -58,6 +58,29 @@ function create_default_context(): Context
     );
 }
 
+#[AsContext(name: 'prod')]
+function create_prod_context(): Context
+{
+    $data = create_default_context();
+    $dockerComposeFiles = array_values(array_filter(
+        $data['docker_compose_files'],
+        static fn (string $file) => !str_contains($file, 'dev')
+    ));
+
+    return create_default_context()
+        ->withData(
+            [
+                'root_domain' => 'monologue.internal.jolicode.com',
+                'docker_compose_files' => $dockerComposeFiles,
+            ],
+            recursive: false
+        )
+        ->withEnvironment([
+            'APP_ENV' => 'prod',
+        ])
+    ;
+}
+
 #[AsContext(name: 'test')]
 function create_test_context(): Context
 {
