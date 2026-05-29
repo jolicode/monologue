@@ -58,7 +58,7 @@ jobs:
             - name: "Run PHPStan"
               run: |
                 # PHPStan need the container to be compiled
-                castor --context=ci builder  bin/console about --env=dev
+                castor --context=ci builder -- bin/console about --env=dev
                 castor qa:phpstan
 
             - name: "Run PHPUnit"
