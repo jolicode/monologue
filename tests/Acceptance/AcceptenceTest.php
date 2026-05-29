@@ -21,7 +21,7 @@ class AcceptenceTest extends WebTestCase
         self::ensureKernelShutdown();
     }
 
-    public function testWithAck()
+    public function testWithAck(): void
     {
         $client = self::createClient();
         // We want to be able to mock some response
@@ -33,17 +33,17 @@ class AcceptenceTest extends WebTestCase
 
         $client->request('POST', '/message', content: $this->getFixtures('001_message_user_A'));
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame(1, $this->conn->fetchOne('SELECT COUNT(*) FROM event'));
-        $this->assertSame(0, $this->conn->fetchOne('SELECT COUNT(*) FROM debt'));
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(1, $this->conn->fetchOne('SELECT COUNT(*) FROM event'));
+        self::assertSame(0, $this->conn->fetchOne('SELECT COUNT(*) FROM debt'));
 
         // #2 message from user A
 
         $client->request('POST', '/message', content: $this->getFixtures('002_message_user_A'));
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame(2, $this->conn->fetchOne('SELECT COUNT(*) FROM event'));
-        $this->assertSame(0, $this->conn->fetchOne('SELECT COUNT(*) FROM debt'));
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(2, $this->conn->fetchOne('SELECT COUNT(*) FROM event'));
+        self::assertSame(0, $this->conn->fetchOne('SELECT COUNT(*) FROM debt'));
 
         // #1 message from user B
 
@@ -56,9 +56,9 @@ class AcceptenceTest extends WebTestCase
         });
         $client->request('POST', '/message', content: $this->getFixtures('003_message_user_B'));
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame(3, $this->conn->fetchOne('SELECT COUNT(*) FROM event'));
-        $this->assertSame(1, $this->conn->fetchOne('SELECT COUNT(*) FROM debt'));
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(3, $this->conn->fetchOne('SELECT COUNT(*) FROM event'));
+        self::assertSame(1, $this->conn->fetchOne('SELECT COUNT(*) FROM debt'));
 
         // /monologue from user A
 
@@ -66,11 +66,11 @@ class AcceptenceTest extends WebTestCase
             'user_id' => 'U0FLDV6UW',
         ]);
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
         $responseDecoded = json_decode($client->getResponse()->getContent(), true);
-        $this->assertCount(3, $responseDecoded['blocks']);
-        $this->assertSame('*Pending debts*', $responseDecoded['blocks'][0]['text']['text']);
-        $this->assertArrayHasKey('accessory', $responseDecoded['blocks'][2]);
+        self::assertCount(3, $responseDecoded['blocks']);
+        self::assertSame('*Pending debts*', $responseDecoded['blocks'][0]['text']['text']);
+        self::assertArrayHasKey('accessory', $responseDecoded['blocks'][2]);
 
         // /monologue from user B
 
@@ -78,11 +78,11 @@ class AcceptenceTest extends WebTestCase
             'user_id' => 'UMYK1MQ3E',
         ]);
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
         $responseDecoded = json_decode($client->getResponse()->getContent(), true);
-        $this->assertCount(3, $responseDecoded['blocks']);
-        $this->assertSame('*Pending debts*', $responseDecoded['blocks'][0]['text']['text']);
-        $this->assertFalse(\array_key_exists('accessory', $responseDecoded['blocks'][2]));
+        self::assertCount(3, $responseDecoded['blocks']);
+        self::assertSame('*Pending debts*', $responseDecoded['blocks'][0]['text']['text']);
+        self::assertFalse(\array_key_exists('accessory', $responseDecoded['blocks'][2]));
 
         // user A marks debt for user B as paid
 
@@ -108,7 +108,7 @@ class AcceptenceTest extends WebTestCase
             'payload' => str_replace('DEBT_ID', $debId, $this->getFixtures('004_mark_as_paid')),
         ]);
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
 
         // /monologue from user B
 
@@ -116,13 +116,13 @@ class AcceptenceTest extends WebTestCase
             'user_id' => 'UMYK1MQ3E',
         ]);
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
         $responseDecoded = json_decode($client->getResponse()->getContent(), true);
-        $this->assertCount(1, $responseDecoded['blocks']);
-        $this->assertSame('*There are no more debts*', $responseDecoded['blocks'][0]['text']['text']);
+        self::assertCount(1, $responseDecoded['blocks']);
+        self::assertSame('*There are no more debts*', $responseDecoded['blocks'][0]['text']['text']);
     }
 
-    public function testWithAmnesty()
+    public function testWithAmnesty(): void
     {
         $client = self::createClient();
         // We want to be able to mock some response
@@ -134,14 +134,14 @@ class AcceptenceTest extends WebTestCase
 
         $client->request('POST', '/message', content: $this->getFixtures('001_message_user_A'));
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
 
         // #1 message from user B
 
         $mockHttpClient->setResponseFactory(new MockResponse('{"ok": true}'));
         $client->request('POST', '/message', content: $this->getFixtures('003_message_user_B'));
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
 
         // /amnesty from user A
 
@@ -149,8 +149,8 @@ class AcceptenceTest extends WebTestCase
             'user_id' => 'U0FLDV6UW',
         ]);
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('{"text":"More people need to ask for amnesty to complete it! (1\/2)"}', $client->getResponse()->getContent());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame('{"text":"More people need to ask for amnesty to complete it! (1\/2)"}', $client->getResponse()->getContent());
 
         // /amnesty from user B
 
@@ -166,8 +166,8 @@ class AcceptenceTest extends WebTestCase
             'user_id' => 'UMYK1MQ3E',
         ]);
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
-        $this->assertSame('', $client->getResponse()->getContent());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame('', $client->getResponse()->getContent());
 
         // /monologue from user B
 
@@ -175,10 +175,10 @@ class AcceptenceTest extends WebTestCase
             'user_id' => 'UMYK1MQ3E',
         ]);
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame(200, $client->getResponse()->getStatusCode());
         $responseDecoded = json_decode($client->getResponse()->getContent(), true);
-        $this->assertCount(1, $responseDecoded['blocks']);
-        $this->assertSame('*There are no more debts*', $responseDecoded['blocks'][0]['text']['text']);
+        self::assertCount(1, $responseDecoded['blocks']);
+        self::assertSame('*There are no more debts*', $responseDecoded['blocks'][0]['text']['text']);
     }
 
     private function getFixtures(string $name): string

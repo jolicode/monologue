@@ -20,7 +20,7 @@ class DebtCreatorTest extends KernelTestCase
         ;
     }
 
-    public function testControlFirstMessage()
+    public function testControlFirstMessage(): void
     {
         // Author: foobar
 
@@ -47,7 +47,7 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertNull($this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertNull($this->bigBrowser->createDebtIfNeeded($payload));
 
         // Author: foobar, a bit later
 
@@ -74,7 +74,7 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertNull($this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertNull($this->bigBrowser->createDebtIfNeeded($payload));
 
         // Author: baz
 
@@ -101,7 +101,7 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertInstanceOf(Debt::class, $this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertInstanceOf(Debt::class, $this->bigBrowser->createDebtIfNeeded($payload));
 
         // Author: baz, a bit later
 
@@ -128,7 +128,7 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertNull($this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertNull($this->bigBrowser->createDebtIfNeeded($payload));
 
         // Author: foobar, a bit later, again
 
@@ -155,7 +155,7 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertNull($this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertNull($this->bigBrowser->createDebtIfNeeded($payload));
 
         // Author: foo, a bit later
 
@@ -182,7 +182,7 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertInstanceOf(Debt::class, $this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertInstanceOf(Debt::class, $this->bigBrowser->createDebtIfNeeded($payload));
 
         // Reaction, author Jean, later
 
@@ -209,7 +209,7 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertInstanceOf(Debt::class, $this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertInstanceOf(Debt::class, $this->bigBrowser->createDebtIfNeeded($payload));
 
         // Reaction, author Jean, later
 
@@ -236,6 +236,6 @@ class DebtCreatorTest extends KernelTestCase
             ],
         ];
 
-        $this->assertNull($this->bigBrowser->createDebtIfNeeded($payload));
+        self::assertNull($this->bigBrowser->createDebtIfNeeded($payload));
     }
 }

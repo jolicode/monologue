@@ -23,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
 
             - name: Check php/Dockerfile
               uses: hadolint/hadolint-action@v3.1.0
@@ -41,10 +41,10 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
 
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v6
 
             - name: setup-castor
-              uses: castor-php/setup-castor@v0.1.0
+              uses: castor-php/setup-castor@v1.0.0
 
             - name: "Build and start the infrastructure"
               run: "castor start"
@@ -52,8 +52,14 @@ jobs:
             - name: "Check PHP coding standards"
               run: "castor qa:cs --dry-run"
 
+            - name: "Run Twig CS"
+              run: "castor qa:twig-cs --dry-run"
+
             - name: "Run PHPStan"
-              run: "castor qa:phpstan"
+              run: |
+                # PHPStan need the container to be compiled
+                castor --context=ci builder  bin/console about --env=dev
+                castor qa:phpstan
 
             - name: "Run PHPUnit"
               run: "castor qa:phpunit"
