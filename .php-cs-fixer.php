@@ -13,7 +13,7 @@ return new PhpCsFixer\Config()
     ->setUnsupportedPhpVersionAllowed(true)
     ->setRiskyAllowed(true)
     ->setRules([
-        '@PHP8x5Migration' => true,
+        '@PHP8x4Migration' => true,
         '@PhpCsFixer' => true,
         '@PhpCsFixer:risky' => true,
         '@Symfony' => true,

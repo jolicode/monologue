@@ -23,6 +23,18 @@ use function Castor\io;
 use function Castor\open;
 use function Castor\run;
 use function Castor\variable;
+use function worktree\get_worktree_name;
+use function worktree\get_worktree_ports;
+
+/** @return array<string, array{env: string, default: int, label: string}> */
+function get_port_specs(): array
+{
+    return [
+        'http' => ['env' => 'PROJECT_HTTP_PORT',  'default' => 80,   'label' => 'HTTP'],
+        'https' => ['env' => 'PROJECT_HTTPS_PORT', 'default' => 443,  'label' => 'HTTPS'],
+        'admin' => ['env' => 'PROJECT_ADMIN_PORT', 'default' => 8080, 'label' => 'Traefik admin'],
+    ];
+}
 
 #[AsTask(description: 'Displays some help and available urls for the current project', namespace: '')]
 function about(): void
@@ -36,9 +48,12 @@ function about(): void
     io()->section('Available URLs for this project:');
     $urls = [variable('root_domain'), ...variable('extra_domains')];
 
+    $worktreeName = get_worktree_name();
+    $adminPort = get_worktree_ports($worktreeName)['admin'];
+
     try {
         $routers = http_client()
-            ->request('GET', \sprintf('http://%s:8080/api/http/routers', variable('root_domain')))
+            ->request('GET', \sprintf('http://%s:%d/api/http/routers', variable('root_domain'), $adminPort))
             ->toArray()
         ;
         $projectName = variable('project_name');
@@ -58,7 +73,12 @@ function about(): void
     } catch (HttpExceptionInterface) {
     }
 
-    io()->listing(array_map(static fn ($url) => "https://{$url}", array_unique($urls)));
+    $httpsPort = null !== $worktreeName ? get_worktree_ports($worktreeName)['https'] : null;
+    $formatUrl = static function (string $host) use ($httpsPort): string {
+        return null !== $httpsPort ? "https://{$host}:{$httpsPort}" : "https://{$host}";
+    };
+
+    io()->listing(array_map($formatUrl, array_unique($urls)));
 }
 
 #[AsTask(description: 'Opens the project in your browser', namespace: '', aliases: ['open'])]
@@ -155,21 +175,14 @@ function stop(
 }
 
 /**
- * @param array<string> $params
+ * @param list<string> $params
  */
 #[AsTask(description: 'Opens a shell (bash) or proxy any command to the builder container', aliases: ['builder'])]
 function builder(#[AsArgsAfterOptionEnd] array $params = []): int
 {
-    $c = context()->withEnvironment($_ENV + $_SERVER);
+    $context = context()->withEnvironment($_ENV + $_SERVER);
 
-    if (0 === \count($params)) {
-        $params = ['bash'];
-        $c = $c->toInteractive();
-    } else {
-        $c = $c->withTty(false)->withPty(false)->withAllowFailure();
-    }
-
-    return (int) docker_compose_run(implode(' ', $params), c: $c)->getExitCode();
+    return (int) docker_compose_run($params, $context)->getExitCode();
 }
 
 /**
@@ -378,6 +391,16 @@ function docker_compose(array $subCommand, ?Context $c = null, array $profiles =
         'REGISTRY' => $c['registry'] ?? '',
     ]);
 
+    $worktreeName = get_worktree_name();
+    if ($worktreeName) {
+        $ports = get_worktree_ports($worktreeName);
+        $portsEnv = [];
+        foreach (get_port_specs() as $key => $spec) {
+            $portsEnv[$spec['env']] = (string) $ports[$key];
+        }
+        $c = $c->withEnvironment($portsEnv);
+    }
+
     if ($c['APP_ENV'] ?? false) {
         $c = $c->withEnvironment([
             'APP_ENV' => $c['APP_ENV'] ?? '',
@@ -404,8 +427,11 @@ function docker_compose(array $subCommand, ?Context $c = null, array $profiles =
     return run($command, context: $c);
 }
 
+/**
+ * @param list<string> $params
+ */
 function docker_compose_run(
-    string $runCommand,
+    array $params,
     ?Context $c = null,
     string $service = 'builder',
     bool $noDeps = true,
@@ -417,6 +443,7 @@ function docker_compose_run(
     $command = [
         'run',
         '--rm',
+        '--quiet',
     ];
 
     if ($noDeps) {
@@ -437,16 +464,57 @@ function docker_compose_run(
         $command[] = "{$key}={$value}";
     }
 
+    if (0 === \count($params)) {
+        $params = ['bash'];
+        $c = $c->toInteractive();
+    } else {
+        $c = $c->withTty(false)->withPty(false)->withInput(STDIN)->withAllowFailure();
+        $params = array_map(escapeshellarg(...), $params);
+    }
+
     $command[] = $service;
     $command[] = '/bin/bash';
     $command[] = '-c';
-    $command[] = "{$runCommand}";
+    $command[] = implode(' ', $params);
 
     return docker_compose($command, c: $c, profiles: ['*']);
 }
 
+/**
+ * @param list<string> $params
+ */
+function docker_compose_exec(
+    array $params,
+    ?Context $context = null,
+    string $service = 'builder',
+): Process {
+    $context ??= context();
+
+    $command = [
+        'exec',
+    ];
+
+    if (0 === \count($params)) {
+        $params = ['bash'];
+        $context = $context->toInteractive();
+    } else {
+        $context = $context->withTty(false)->withPty(false)->withInput(STDIN)->withAllowFailure();
+        $params = array_map(escapeshellarg(...), $params);
+    }
+
+    $command[] = $service;
+    $command[] = '/bin/bash';
+    $command[] = '-c';
+    $command[] = implode(' ', $params);
+
+    return docker_compose($command, c: $context, profiles: ['*']);
+}
+
+/**
+ * @param list<string> $params
+ */
 function docker_exit_code(
-    string $runCommand,
+    array $params,
     ?Context $c = null,
     string $service = 'builder',
     bool $noDeps = true,
@@ -455,7 +523,7 @@ function docker_exit_code(
     $c = ($c ?? context())->withAllowFailure();
 
     $process = docker_compose_run(
-        runCommand: $runCommand,
+        params: $params,
         c: $c,
         service: $service,
         noDeps: $noDeps,
@@ -463,19 +531,6 @@ function docker_exit_code(
     );
 
     return $process->getExitCode() ?? 0;
-}
-
-// Mac users have a lot of problems running Yarn / Webpack on the Docker stack
-// so this func allow them to run these tools on their host
-function run_in_docker_or_locally_for_mac(string $command, ?Context $c = null): void
-{
-    $c ??= context();
-
-    if ($c['macos']) {
-        run($command, context: $c->withWorkingDirectory($c['root_dir']));
-    } else {
-        docker_compose_run($command, c: $c);
-    }
 }
 
 #[AsTask(description: 'Push images cache to the registry', namespace: 'docker', name: 'push', aliases: ['push'])]
@@ -606,4 +661,27 @@ function get_services(?string $profile = null): array
 function get_service_names(?string $profile = null): array
 {
     return array_keys(get_services($profile));
+}
+
+#[AsTask(description: 'Displays the ports allocated for the current project', namespace: 'docker')]
+function ports(): void
+{
+    $project = variable('project_name');
+    $domain = variable('root_domain');
+    $name = get_worktree_name();
+    $ports = get_worktree_ports($name);
+
+    io()->title('Ports');
+    $list = [['Project' => $project]];
+    foreach (get_port_specs() as $key => $spec) {
+        $scheme = 'admin' === $key ? 'http' : $key;
+        $host = 'admin' === $key ? 'localhost' : $domain;
+        $list[] = [$spec['label'] => "{$scheme}://{$host}:{$ports[$key]}"];
+    }
+
+    if ($name) {
+        array_unshift($list, ['Worktree' => $name]);
+    }
+
+    io()->definitionList(...$list);
 }
