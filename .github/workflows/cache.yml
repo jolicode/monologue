@@ -22,10 +22,10 @@ jobs:
               run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
             - name: setup-castor
-              uses: castor-php/setup-castor@v1.0.0
+              uses: castor-php/setup-castor@v1.1.0
 
             - name: Checkout
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
               with:
                   persist-credentials: false
 
