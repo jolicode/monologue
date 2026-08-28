@@ -13,12 +13,30 @@ updates:
           default-days: 7
 
     - package-ecosystem: 'composer'
-      directory: '/'
+      directories:
+          - '/'
+          - '/tools/php-cs-fixer'
+          - '/tools/phpstan'
+          - '/tools/twig-cs-fixer'
       target-branch: 'main'
       schedule:
           interval: 'monthly'
       groups:
           composer:
+              patterns:
+                  - '*'
+      cooldown:
+          default-days: 7
+
+    - package-ecosystem: 'docker'
+      directories:
+          - '/infrastructure/docker/services/php'
+          - '/infrastructure/docker/services/router'
+      target-branch: 'main'
+      schedule:
+          interval: 'monthly'
+      groups:
+          docker:
               patterns:
                   - '*'
       cooldown:
