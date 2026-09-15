@@ -159,7 +159,7 @@ class AcceptenceTest extends WebTestCase
         self::assertSame(1, $this->conn->fetchOne("SELECT COUNT(*) FROM debt WHERE author = 'U0FLDV6UW'"));
         $oldestDebtId = $this->conn->fetchOne("SELECT id FROM debt WHERE author = 'UMYK1MQ3E' ORDER BY created_at ASC LIMIT 1");
 
-        // /monologue from user A: debts are grouped by user, oldest first
+        // /monologue from user A: debts are grouped by user, the biggest debtor first
 
         $client->request('POST', '/command/list', parameters: [
             'user_id' => 'U0FLDV6UW',
@@ -278,6 +278,89 @@ class AcceptenceTest extends WebTestCase
 
         self::assertSame(400, $client->getResponse()->getStatusCode());
         self::assertSame('There are no pending debts for this user.', $client->getResponse()->getContent());
+    }
+
+    public function testDebtorsAreSortedByDebtCountThenByOldestDebt(): void
+    {
+        $client = self::createClient();
+        // We want to be able to mock some response
+        $client->disableReboot();
+        /** @var MockHttpClient */
+        $mockHttpClient = self::getContainer()->get('http_client.transport');
+
+        // The "Fraud detected" notifications are not the subject of this test
+        $mockHttpClient->setResponseFactory(static fn (): MockResponse => new MockResponse('{"ok": true}'));
+
+        // Day 1: user B speaks first, then user A: 1 debt for user A
+
+        $client->request('POST', '/message', content: $this->getFixtures('003_message_user_B'));
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+
+        $client->request('POST', '/message', content: $this->getFixtures('001_message_user_A', shift: 3600));
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+
+        // Day 2 and 3: user A speaks first, then user B: 2 debts for user B
+
+        foreach ([1, 2] as $day) {
+            $client->request('POST', '/message', content: $this->getFixtures('001_message_user_A', shift: $day * self::DAY));
+            self::assertSame(200, $client->getResponse()->getStatusCode());
+
+            $client->request('POST', '/message', content: $this->getFixtures('003_message_user_B', shift: $day * self::DAY));
+            self::assertSame(200, $client->getResponse()->getStatusCode());
+        }
+
+        self::assertSame(1, $this->conn->fetchOne("SELECT COUNT(*) FROM debt WHERE author = 'U0FLDV6UW'"));
+        self::assertSame(2, $this->conn->fetchOne("SELECT COUNT(*) FROM debt WHERE author = 'UMYK1MQ3E'"));
+        $oldestDebtIdOfB = $this->conn->fetchOne("SELECT id FROM debt WHERE author = 'UMYK1MQ3E' ORDER BY created_at ASC LIMIT 1");
+
+        // /monologue from user A: user B comes first because it has more debts,
+        // even if the debt of user A is older
+
+        $client->request('POST', '/command/list', parameters: [
+            'user_id' => 'U0FLDV6UW',
+        ]);
+
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+        $blocks = json_decode($client->getResponse()->getContent(), true)['blocks'];
+        self::assertCount(5, $blocks);
+        self::assertSame(\sprintf(
+            '<@UMYK1MQ3E>, 2 debts: %s, %s.',
+            $this->daysAgo('1668615833', 1 * self::DAY),
+            $this->daysAgo('1668615833', 2 * self::DAY),
+        ), $blocks[2]['text']['text']);
+        self::assertSame('actions', $blocks[3]['type']);
+        self::assertSame('ack-' . $oldestDebtIdOfB, $blocks[3]['elements'][0]['value']);
+        self::assertSame(\sprintf('<@U0FLDV6UW>, 1 debt: %s.', $this->daysAgo('1668614312', 3600)), $blocks[4]['text']['text']);
+
+        // user A marks the first debt of user B as paid: both users have 1 debt
+        // left, user A comes first because its debt is older
+
+        $mockHttpClient->setResponseFactory([
+            function (string $method, string $url, array $options = []): MockResponse {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://hooks.slack.com/actions/T0FLD8LEM/4375527081910/uouQFvOW3NHFQjJmyAv53ZZF', $url);
+                $blocks = json_decode($options['body'], true)['blocks'];
+                $this->assertCount(5, $blocks);
+                $this->assertSame(\sprintf('<@U0FLDV6UW>, 1 debt: %s.', $this->daysAgo('1668614312', 3600)), $blocks[2]['text']['text']);
+                $this->assertSame(\sprintf('<@UMYK1MQ3E>, 1 debt: %s.', $this->daysAgo('1668615833', 2 * self::DAY)), $blocks[3]['text']['text']);
+                $this->assertSame(['Mark as paid'], $this->getButtonLabels($blocks[4]));
+
+                return new MockResponse('{"ok": true}');
+            },
+            function (string $method, string $url, array $options = []): MockResponse {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://slack.com/api/chat.postMessage', $url);
+
+                return new MockResponse('{"ok": true}');
+            },
+        ]);
+
+        $client->request('POST', '/action', parameters: [
+            'payload' => str_replace('DEBT_ID', $oldestDebtIdOfB, $this->getFixtures('004_mark_as_paid')),
+        ]);
+
+        self::assertSame(200, $client->getResponse()->getStatusCode());
+        self::assertSame([$oldestDebtIdOfB], $this->conn->fetchFirstColumn('SELECT id FROM debt WHERE paid'));
     }
 
     public function testWithAmnesty(): void
