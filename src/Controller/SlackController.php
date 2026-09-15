@@ -25,7 +25,7 @@ class SlackController extends AbstractController
         private readonly DebtListBlockBuilder $debtListBlockBuilder,
         private readonly DebtListPoster $debtListPoster,
         private readonly EntityManagerInterface $em,
-        private readonly DebtAckPoster $debAckPoster,
+        private readonly DebtAckPoster $debtAckPoster,
         private readonly Government $government,
         private readonly LoggerInterface $logger = new NullLogger(),
     ) {
@@ -50,14 +50,16 @@ class SlackController extends AbstractController
             return new Response('No payload', 400);
         }
 
-        if (!preg_match('{^ack\-(.*)$}', $payload['actions'][0]['value'] ?? '', $m)) {
-            return new Response('Payload not supported.', 400);
-        }
-
-        $debtId = $m[1];
+        $value = (string) ($payload['actions'][0]['value'] ?? '');
 
         try {
-            $debt = $this->debtAcker->ackDebt($payload, $debtId);
+            if (preg_match('{^ack-all-(.+)$}', $value, $m)) {
+                $debts = $this->debtAcker->ackAllDebts($payload, $m[1]);
+            } elseif (preg_match('{^ack-(.+)$}', $value, $m)) {
+                $debts = [$this->debtAcker->ackDebt($payload, $m[1])];
+            } else {
+                return new Response('Payload not supported.', 400);
+            }
         } catch (\DomainException $e) {
             $this->logger->warning('Something went wrong.', [
                 'exception' => $e,
@@ -65,9 +67,10 @@ class SlackController extends AbstractController
 
             return new Response($e->getMessage(), 400);
         }
+
         $this->em->flush();
         $this->debtListPoster->postDebtList($payload['user']['id'], $payload['response_url']);
-        $this->debAckPoster->postDebtAck($debt, $payload['user']['id']);
+        $this->debtAckPoster->postDebtsAck($debts, $payload['user']['id']);
 
         return new Response('ok');
     }

@@ -32,4 +32,25 @@ class DebtAcker
 
         return $debt;
     }
+
+    /**
+     * @return non-empty-list<Debt>
+     */
+    public function ackAllDebts(array $payload, string $author): array
+    {
+        if ($author === $payload['user']['id']) {
+            throw new \DomainException('You can not ACK your own debts.');
+        }
+
+        $debts = $this->debtRepository->findPendingsByAuthor($author);
+        if (!$debts) {
+            throw new \DomainException('There are no pending debts for this user.');
+        }
+
+        foreach ($debts as $debt) {
+            $debt->markAsPaid();
+        }
+
+        return $debts;
+    }
 }
