@@ -76,7 +76,7 @@ tasks. It's not mandatory but it's easier with it.
 
 In slack you have two commands
 
-* `/monologue` to list all the debts;
+* `/monologue` to list all the pending debts, grouped by user, with buttons to mark the oldest one or all of them as paid;
 * `/amnesty` to ask for a general amnesty.
 
 ## Credits

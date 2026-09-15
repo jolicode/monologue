@@ -36,7 +36,7 @@ class DebtRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Debt[]
+     * @return list<Debt>
      */
     public function findPendings(): array
     {
@@ -45,6 +45,38 @@ class DebtRepository extends ServiceEntityRepository
             ->andWhere('d.paid = :paid')->setParameter('paid', false)
             ->addOrderBy('d.createdAt', 'ASC')
             ->addOrderBy('d.author', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
+     * Authors are sorted by their oldest pending debt, and the debts of each
+     * author are sorted from the oldest to the newest.
+     *
+     * @return array<string, non-empty-list<Debt>>
+     */
+    public function findPendingsGroupedByAuthor(): array
+    {
+        $debtsByAuthor = [];
+
+        foreach ($this->findPendings() as $debt) {
+            $debtsByAuthor[$debt->getAuthor()][] = $debt;
+        }
+
+        return $debtsByAuthor;
+    }
+
+    /**
+     * @return list<Debt>
+     */
+    public function findPendingsByAuthor(string $author): array
+    {
+        return $this
+            ->createQueryBuilder('d')
+            ->andWhere('d.paid = :paid')->setParameter('paid', false)
+            ->andWhere('d.author = :author')->setParameter('author', $author)
+            ->addOrderBy('d.createdAt', 'ASC')
             ->getQuery()
             ->getResult()
         ;

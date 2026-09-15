@@ -11,9 +11,19 @@ class DebtAckPoster
     ) {
     }
 
-    public function postDebtAck(Debt $debt, string $user): void
+    /**
+     * @param non-empty-list<Debt> $debts All the debts must belong to the same author
+     */
+    public function postDebtsAck(array $debts, string $user): void
     {
-        $message = \sprintf("<@%s>'s debt was marked as paid by <@%s> !", $debt->getAuthor(), $user);
+        $author = $debts[0]->getAuthor();
+        $count = \count($debts);
+
+        if (1 === $count) {
+            $message = \sprintf("<@%s>'s debt was marked as paid by <@%s> !", $author, $user);
+        } else {
+            $message = \sprintf("<@%s>'s %d debts were marked as paid by <@%s> !", $author, $count, $user);
+        }
 
         $this->messagePoster->postMessage($message);
     }
