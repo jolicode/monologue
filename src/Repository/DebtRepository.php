@@ -51,8 +51,9 @@ class DebtRepository extends ServiceEntityRepository
     }
 
     /**
-     * Authors are sorted by their oldest pending debt, and the debts of each
-     * author are sorted from the oldest to the newest.
+     * Authors are sorted by their number of pending debts (the biggest debtors
+     * first), then by their oldest pending debt. The debts of each author are
+     * sorted from the oldest to the newest.
      *
      * @return array<string, non-empty-list<Debt>>
      */
@@ -60,9 +61,15 @@ class DebtRepository extends ServiceEntityRepository
     {
         $debtsByAuthor = [];
 
+        // The debts are sorted by date, so the authors are inserted in the
+        // order of their oldest debt
         foreach ($this->findPendings() as $debt) {
             $debtsByAuthor[$debt->getAuthor()][] = $debt;
         }
+
+        // The sort is stable: authors with the same number of debts keep the
+        // order of their oldest debt
+        uasort($debtsByAuthor, static fn (array $a, array $b): int => \count($b) <=> \count($a));
 
         return $debtsByAuthor;
     }
