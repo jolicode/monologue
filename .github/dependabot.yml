@@ -44,5 +44,9 @@ updates:
           docker:
               patterns:
                   - '*'
+          docker-security:
+              applies-to: security-updates
+              patterns:
+                  - '*'
       cooldown:
           default-days: 7

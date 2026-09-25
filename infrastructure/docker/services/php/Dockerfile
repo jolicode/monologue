@@ -89,19 +89,20 @@ RUN apt-get update \
         "git" \
         "make" \
         "php${PHP_VERSION}-dev" \
-        "sudo" \
         "unzip" \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 # Install a fake sudo command
-# This is commented out by default because it exposes a security risk if you use this image in production, but it may be useful for development
+# The real `sudo` refuses to work because the container runs as the host's
+# raw UID, which has no /etc/passwd entry. This is a security risk if you use
+# this image in production, but it's fine for the dev-only builder image.
 # Use it at your own risk
 # COPY base/sudo.sh /usr/local/bin/sudo
-# RUN curl -L https://github.com/tianon/gosu/releases/download/1.16/gosu-amd64 -o /usr/local/bin/gosu && \
-#    chmod u+s /usr/local/bin/gosu && \
-#    chmod +x /usr/local/bin/gosu && \
-#    chmod +x /usr/local/bin/sudo
+# RUN curl -L https://github.com/tianon/gosu/releases/download/1.16/gosu-amd64 -o /usr/local/bin/gosu \
+#     && chmod u+s /usr/local/bin/gosu \
+#     && chmod +x /usr/local/bin/gosu \
+#     && chmod +x /usr/local/bin/sudo
 
 # Config
 COPY builder/php-configuration /etc/php/${PHP_VERSION}
@@ -133,11 +134,13 @@ RUN sed /tmp/completion.bash \
 # Third party tools
 ENV PATH="$PATH:/var/www/tools/bin"
 
-# Good default customization
-RUN cat >> /etc/bash.bashrc <<EOF
+# We can't rely on \u: the container runs as the host's raw UID, which has no
+# /etc/passwd entry, so bash would print "I have no name!" instead. Show
+# "builder" normally, and "root" once elevated (e.g. via the fake sudo).
+RUN cat >> /etc/bash.bashrc <<'EOF'
 . /etc/bash_completion
 
-PS1='\[\e[01;33m\]\u \[\e[00;32m\]\w\[\e[0m\] '
+PS1='\[\e[01;33m\]$([ "$EUID" = 0 ] && echo root || echo builder) \[\e[00;32m\]\w\[\e[0m\] '
 EOF
 
 WORKDIR /var/www

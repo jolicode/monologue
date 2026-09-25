@@ -23,6 +23,7 @@ castor app:install                           # composer install + qa:install
 castor app:db:migrate                        # Doctrine migrations (alias: castor migrate)
 castor app:db:fixtures                       # fixtures (alias: castor fixtures) — currently a no-op, no loader is configured
 castor postgres:client                       # opens an interactive psql shell (alias: castor postgres / pg)
+castor pg -- "SELECT now();"                 # one-shot query (or raw psql arguments: castor pg -- -c "\dt")
 ```
 
 Docker:
