@@ -7,6 +7,7 @@ use Castor\Attribute\AsOption;
 use Castor\Attribute\AsTask;
 use Castor\Context;
 use Castor\Helper\PathHelper;
+use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\ExceptionInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -96,7 +97,7 @@ function open_project(): void
 
 #[AsTask(description: 'Builds the infrastructure', aliases: ['build'])]
 function build(
-    #[AsOption(description: 'The service to build (default: all services)', autocomplete: 'docker\get_service_names')]
+    #[AsOption(description: 'The service to build (default: all services)', autocomplete: 'docker\complete_service_names')]
     ?string $service = null,
     ?string $profile = null,
 ): void {
@@ -132,7 +133,7 @@ function build(
  */
 #[AsTask(description: 'Builds and starts the infrastructure', aliases: ['up'])]
 function up(
-    #[AsOption(description: 'The service to start (default: all services)', autocomplete: 'docker\get_service_names')]
+    #[AsOption(description: 'The service to start (default: all services)', autocomplete: 'docker\complete_service_names')]
     ?string $service = null,
     #[AsOption(mode: InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED)]
     array $profiles = [],
@@ -163,7 +164,7 @@ function up(
  */
 #[AsTask(description: 'Stops the infrastructure', aliases: ['stop'])]
 function stop(
-    #[AsOption(description: 'The service to stop (default: all services)', autocomplete: 'docker\get_service_names')]
+    #[AsOption(description: 'The service to stop (default: all services)', autocomplete: 'docker\complete_service_names')]
     ?string $service = null,
     #[AsOption(mode: InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED)]
     array $profiles = [],
@@ -669,6 +670,16 @@ function get_services(?string $profile = null): array
 function get_service_names(?string $profile = null): array
 {
     return array_keys(get_services($profile));
+}
+
+/**
+ * Autocompletion of the --service options.
+ *
+ * @return list<string>
+ */
+function complete_service_names(CompletionInput $input): array
+{
+    return get_service_names();
 }
 
 #[AsTask(description: 'Displays the ports allocated for the current project', namespace: 'docker')]
