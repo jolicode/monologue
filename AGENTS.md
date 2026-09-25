@@ -48,7 +48,7 @@ The context changes how tasks are executed (`APP_ENV`, compose files, etc.):
 ```bash
 castor --context=test qa:phpunit             # APP_ENV=test, for tests
 castor --context=ci ...                      # like test, tuned for CI
-castor --context=prod ...                    # real domain (monologue.internal.jolicode.com), no dev compose file
+castor --context=prod ...                    # production images on a dedicated local stack (docker-compose.prod.yml)
 ```
 
 Always run tests and anything touching the database with `--context=test`.
@@ -59,6 +59,10 @@ Without option, the `default` context applies.
 - Plain Symfony app at the repository root (docroot = `public/`), no `application/` subdirectory
 - PostgreSQL 16: user/pass/db = `app`/`app`, `DATABASE_URL` already configured in `.env`
 - nginx + php-fpm (service `frontend`), Traefik router (service `router`, dev only), HTTPS on `<root_domain>` (see `castor.php`)
+- Production ships as two images (`php` and `nginx`), built from the "Production stages" of
+  `infrastructure/docker/services/php/Dockerfile` and pushed to GHCR by `.github/workflows/build-push.yml`
+  (see the "Production" section of `README.md`). php-fpm and nginx configuration
+  (`services/php/php/`, `services/php/nginx/`) is shared with the dev `frontend` container
 - This is a Slack bot (see `README.md`); the Slack integration lives in `src/Slack/`, and `doc/slack.yaml` is the Slack app manifest
 
 ## QA — before considering a task done

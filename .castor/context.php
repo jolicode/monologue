@@ -22,6 +22,8 @@ function create_default_context(): Context
             'docker-compose.dev.yml',
         ],
         'docker_compose_run_environment' => [],
+        // Service in which `docker_compose_run()` executes commands (composer, bin/console...)
+        'docker_compose_run_service' => 'builder',
         'macos' => false,
         'power_shell' => false,
         // check if posix_geteuid is available, if not, use getmyuid (windows)
@@ -64,27 +66,28 @@ function create_default_context(): Context
     );
 }
 
+/**
+ * Production images (see the "Production stages" of the Dockerfile): the same tasks as in
+ * dev, on a dedicated compose stack. E.g. `castor start -c prod`, `castor docker:push -c prod`.
+ */
 #[AsContext(name: 'prod')]
 function create_prod_context(): Context
 {
-    $data = create_default_context();
-    $dockerComposeFiles = array_values(array_filter(
-        $data['docker_compose_files'],
-        static fn (string $file) => !str_contains($file, 'dev')
-    ));
+    $c = create_default_context();
 
-    return create_default_context()
-        ->withData(
-            [
-                'root_domain' => 'monologue.internal.jolicode.com',
-                'docker_compose_files' => $dockerComposeFiles,
+    return $c->withData(
+        [
+            // Dedicated compose project: never collides with the dev stack (containers, volumes)
+            'project_name' => $c['project_name'] . '-prod',
+            'registry' => getenv('REGISTRY') ?: $c['registry'],
+            'docker_compose_files' => [
+                'docker-compose.prod.yml',
             ],
-            recursive: false
-        )
-        ->withEnvironment([
-            'APP_ENV' => 'prod',
-        ])
-    ;
+            // There is no builder service in this stack: commands run in the application image
+            'docker_compose_run_service' => 'php',
+        ],
+        recursive: false,
+    );
 }
 
 #[AsContext(name: 'test')]

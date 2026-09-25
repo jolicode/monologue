@@ -46,6 +46,13 @@ function about(): void
     io()->comment('Run <comment>castor help [command]</comment> to display Castor help.');
 
     io()->section('Available URLs for this project:');
+
+    if (!has_router()) {
+        io()->listing([\sprintf('http://127.0.0.1:%s', getenv('HTTP_PORT') ?: '8080')]);
+
+        return;
+    }
+
     $urls = [variable('root_domain'), ...variable('extra_domains')];
 
     $worktreeName = get_worktree_name();
@@ -241,6 +248,11 @@ function destroy(
     }
 
     docker_compose(['down', '--remove-orphans', '--volumes', '--rmi=local'], profiles: ['*']);
+
+    if (!has_router()) {
+        return;
+    }
+
     $files = finder()
         ->in(variable('root_dir') . '/infrastructure/docker/services/router/certs/')
         ->name('*.pem')
@@ -254,6 +266,12 @@ function generate_certificates(
     #[AsOption(description: 'Force the certificates re-generation without confirmation', shortcut: 'f')]
     bool $force = false,
 ): void {
+    if (!has_router()) {
+        io()->comment('No router in this stack, no SSL certificates to generate.');
+
+        return;
+    }
+
     $sslDir = variable('root_dir') . '/infrastructure/docker/services/router/certs';
 
     if (file_exists("{$sslDir}/cert.pem") && !$force) {
@@ -441,12 +459,13 @@ function docker_compose(array $subCommand, ?Context $c = null, array $profiles =
 function docker_compose_run(
     array $params,
     ?Context $c = null,
-    string $service = 'builder',
+    ?string $service = null,
     bool $noDeps = true,
     ?string $workDir = null,
     bool $portMapping = false,
 ): Process {
     $c ??= context();
+    $service ??= $c['docker_compose_run_service'];
 
     $command = [
         'run',
@@ -541,19 +560,39 @@ function docker_exit_code(
     return $process->getExitCode() ?? 0;
 }
 
-#[AsTask(description: 'Push images cache to the registry', namespace: 'docker', name: 'push', aliases: ['push'])]
-function push(bool $dryRun = false): void
+/**
+ * Whether the current stack includes the traefik router (dev), which needs SSL certificates
+ * and gives the project its URLs.
+ */
+function has_router(): bool
 {
+    return isset(get_services()['router']);
+}
+
+/**
+ * Pushes the build cache of every service declaring a `cache_from`. With `--tag`, the images
+ * themselves are pushed too, e.g. `castor docker:push -c prod --tag=abc1234 --tag=latest`.
+ *
+ * @param list<string> $tag
+ */
+#[AsTask(description: 'Push images cache (and images, with --tag) to the registry', namespace: 'docker', name: 'push', aliases: ['push'])]
+function push(
+    bool $dryRun = false,
+    #[AsOption(description: 'Also push the images, with this tag (repeatable)', mode: InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED)]
+    array $tag = [],
+): void {
     $registry = variable('registry');
 
     if (!$registry) {
         throw new \RuntimeException('You must define a registry to push images.');
     }
 
+    $services = get_services();
+
     // Only services with a cache_from can push their build cache back to the registry.
     $cacheFroms = array_filter(array_map(
         static fn (array $config) => $config['build']['cache_from'][0] ?? null,
-        get_services(),
+        $services,
     ));
 
     $c = context()
@@ -574,6 +613,21 @@ function push(bool $dryRun = false): void
     foreach ($cacheFroms as $service => $cacheFrom) {
         $command[] = '--set';
         $command[] = "{$service}.cache-to={$cacheFrom},mode=max";
+
+        if (!$tag) {
+            continue;
+        }
+
+        // Image name without its tag, e.g. "ghcr.io/jolicode/monologue/php"
+        $image = isset($services[$service]['image']) ? preg_replace('{:[^/]+$}', '', $services[$service]['image']) : "{$registry}/{$service}";
+
+        foreach ($tag as $t) {
+            $command[] = '--set';
+            $command[] = "{$service}.tags={$image}:{$t}";
+        }
+
+        $command[] = '--set';
+        $command[] = "{$service}.output=type=registry";
     }
 
     if ($dryRun) {
@@ -584,7 +638,7 @@ function push(bool $dryRun = false): void
 }
 
 /**
- * @return array<string, array{profiles?: list<string>, build: array{context: string, dockerfile?: string, cache_from?: list<string>, target?: string}}>
+ * @return array<string, array{image?: string, profiles?: list<string>, build: array{context: string, dockerfile?: string, cache_from?: list<string>, target?: string, additional_contexts?: array<string, string>}}>
  */
 function get_services(?string $profile = null): array
 {
