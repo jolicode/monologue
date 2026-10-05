@@ -20,7 +20,6 @@
 
 ###> infrastructure ###
 /.castor.stub.php
-/.home/
 /infrastructure/docker/docker-compose.override.yml
 /infrastructure/docker/services/router/certs/*.pem
 ###< infrastructure ###

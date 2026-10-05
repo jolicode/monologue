@@ -43,8 +43,8 @@ services:
             <<: *php-build
             target: php
             cache_from:
-                - "type=registry,ref=${REGISTRY:-ghcr.io/jolicode/monologue}/php:cache"
-        image: "${REGISTRY:-ghcr.io/jolicode/monologue}/php:${TAG:-latest}"
+                - "type=registry,ref=${REGISTRY:-}/php:cache"
+        image: "${REGISTRY:-${PROJECT_NAME}}/php:${TAG:-latest}"
         environment: *app-env
         env_file:
             # Optional, gitignored: real credentials (Slack, dashboard password...) for a local test.
@@ -62,10 +62,10 @@ services:
             <<: *php-build
             target: nginx
             cache_from:
-                - "type=registry,ref=${REGISTRY:-ghcr.io/jolicode/monologue}/nginx:cache"
-        image: "${REGISTRY:-ghcr.io/jolicode/monologue}/nginx:${TAG:-latest}"
+                - "type=registry,ref=${REGISTRY:-}/nginx:cache"
+        image: "${REGISTRY:-${PROJECT_NAME}}/nginx:${TAG:-latest}"
         ports:
-            - "${HTTP_PORT:-8080}:8080"
+            - "${HTTP_PORT:-8000}:8080"
         volumes:
             - php-socket:/var/run/php
         depends_on:

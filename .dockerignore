@@ -24,6 +24,7 @@ foobar.sh
 .gitignore
 LICENSE
 phpunit.dist.xml
+phpunit.xml.dist
 
 # Mirrors .gitignore: local/generated files that must never end up baked
 # into the image (some carry secrets, e.g. the prod secrets decryption key)
@@ -34,6 +35,7 @@ phpunit.dist.xml
 .env.local.php
 .env.*.local
 .phpunit.cache
+.phpunit.result.cache
 phpunit.xml
 config/reference.php
 config/secrets/prod/prod.decrypt.private.php

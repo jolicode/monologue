@@ -174,7 +174,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # Dependencies first, for better layer caching. "app" is a build context, not a stage
 # hadolint ignore=DL3022
 COPY --from=app composer.json composer.lock symfony.lock ./
-RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-scripts --optimize-autoloader
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
 
 # hadolint ignore=DL3022
 COPY --from=app . .
