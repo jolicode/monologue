@@ -102,7 +102,7 @@ router), independent from the development one:
 
     castor build -c prod       # builds the php and nginx images
     castor start -c prod       # starts the stack and runs the migrations
-    # -> http://127.0.0.1:8080 (HTTP_PORT=18080 castor start -c prod to change the port)
+    # -> http://127.0.0.1:8000 (HTTP_PORT=18000 castor start -c prod to change the port)
     castor destroy -c prod     # removes the containers and the volumes
 
 It uses dummy secrets: to test with a real Slack workspace, put the

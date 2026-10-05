@@ -49,7 +49,7 @@ function about(): void
     io()->section('Available URLs for this project:');
 
     if (!has_router()) {
-        io()->listing([\sprintf('http://127.0.0.1:%s', getenv('HTTP_PORT') ?: '8080')]);
+        io()->listing([\sprintf('http://127.0.0.1:%s', getenv('HTTP_PORT') ?: '8000')]);
 
         return;
     }
@@ -544,7 +544,7 @@ function docker_compose_exec(
 function docker_exit_code(
     array $params,
     ?Context $c = null,
-    string $service = 'builder',
+    ?string $service = null,
     bool $noDeps = true,
     ?string $workDir = null,
 ): int {
