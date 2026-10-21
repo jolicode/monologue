@@ -79,7 +79,9 @@ function create_prod_context(): Context
         [
             // Dedicated compose project: never collides with the dev stack (containers, volumes)
             'project_name' => $c['project_name'] . '-prod',
-            'registry' => getenv('REGISTRY') ?: $c['registry'],
+            // Docker requires lowercase image names, but `${{ github.repository }}`
+            // (GitHub Actions) keeps the case of the owner and of the repository
+            'registry' => strtolower(getenv('REGISTRY') ?: $c['registry']),
             'docker_compose_files' => [
                 'docker-compose.prod.yml',
             ],
