@@ -57,9 +57,15 @@ function create_default_context(): Context
         $data['project_name'] .= '-wt-' . $worktreeName;
     }
 
+    // Only when someone can answer the prompts of the commands: stdin is a terminal, outside of
+    // a CI (as for Castor). Otherwise (CI, pipes, AI agents...), a PTY would give them a terminal
+    // nobody types in, and a prompt (composer, bin/console...) would wait forever. Unlike
+    // Context::supportsInteraction(), stdout may be piped (e.g. `castor init | tee init.log`).
+    $canAnswerPrompts = false === getenv('CI') && stream_isatty(STDIN);
+
     return new Context(
         $data,
-        pty: Process::isPtySupported(),
+        pty: Process::isPtySupported() && $canAnswerPrompts,
         environment: [
             'BUILDKIT_PROGRESS' => 'plain',
         ]
@@ -79,7 +85,9 @@ function create_prod_context(): Context
         [
             // Dedicated compose project: never collides with the dev stack (containers, volumes)
             'project_name' => $c['project_name'] . '-prod',
-            'registry' => getenv('REGISTRY') ?: $c['registry'],
+            // Docker requires lowercase image names, but `${{ github.repository }}`
+            // (GitHub Actions) keeps the case of the owner and of the repository
+            'registry' => strtolower(getenv('REGISTRY') ?: $c['registry']),
             'docker_compose_files' => [
                 'docker-compose.prod.yml',
             ],
