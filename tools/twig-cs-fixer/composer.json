@@ -1,7 +1,7 @@
 {
     "type": "project",
     "require": {
-        "vincentlanglet/twig-cs-fixer": "^4.1.1"
+        "vincentlanglet/twig-cs-fixer": "^4.1.2"
     },
     "config": {
         "platform": {
